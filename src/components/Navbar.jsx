@@ -42,10 +42,10 @@ export default function Navbar({ activeTab, setActiveTab, onQuickExport }) {
           </div>
           <div>
             <div className="font-syne" style={{ fontSize: '18px', fontWeight: '800', letterSpacing: '-0.5px', color: '#FFF' }}>
-              OM<span style={{ color: '#00DFD8' }}>.DESIGN STUDIO</span>
+              OM GRAPHIC <span style={{ color: '#00DFD8' }}>STUDIO</span>
             </div>
             <div className="font-space" style={{ fontSize: '10px', color: '#94A3B8', letterSpacing: '1px', textTransform: 'uppercase' }}>
-              Digital & Print Graphic Suite
+              Digital & Print Creative Suite
             </div>
           </div>
         </div>
