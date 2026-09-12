@@ -10,14 +10,71 @@ import {
   Sliders, Grid, ShieldAlert, FileText, CheckCircle2, Image as ImageIcon, RotateCcw, Upload
 } from 'lucide-react';
 
+const FEATURED_FONTS = [
+  { name: "Syne", label: "Syne (Avant-Garde Display)" },
+  { name: "Playfair Display", label: "Playfair Display (Luxury Serif)" },
+  { name: "Space Grotesk", label: "Space Grotesk (Swiss Neo-Grotesque)" },
+  { name: "Outfit", label: "Outfit (Modern Geometric)" },
+  { name: "Bebas Neue", label: "Bebas Neue (Bold Poster)" },
+  { name: "Montserrat", label: "Montserrat (Clean Corporate)" },
+  { name: "Cinzel", label: "Cinzel (Imperial Roman Serif)" },
+  { name: "Orbitron", label: "Orbitron (Cyber Tech)" },
+  { name: "Abril Fatface", label: "Abril Fatface (High-Contrast)" },
+  { name: "Poppins", label: "Poppins (Modern Sans)" },
+  { name: "Dancing Script", label: "Dancing Script (Calligraphy)" },
+  { name: "Great Vibes", label: "Great Vibes (Elegant Script)" },
+  { name: "Righteous", label: "Righteous (Pop Retro)" },
+  { name: "Cormorant Garamond", label: "Cormorant Garamond (Fine Art Serif)" },
+  { name: "Permanent Marker", label: "Permanent Marker (Brush Poster)" },
+  { name: "Noto Sans Gujarati", label: "Noto Sans Gujarati (ગુજરાતી ફોન્ટ)" },
+  { name: "Inter", label: "Inter (UI Sans)" }
+];
+
+const loadGoogleFont = (fontName) => {
+  if (!fontName) return;
+  const linkId = `gfont-${fontName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+  if (!document.getElementById(linkId)) {
+    const link = document.createElement('link');
+    link.id = linkId;
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;600;700;800;900&display=swap`;
+    document.head.appendChild(link);
+  }
+};
+
 export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport }) {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
+  const fontFileInputRef = useRef(null);
   const [activeFormat, setActiveFormat] = useState(MEDIA_FORMATS[0]);
   const [showBleed, setShowBleed] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
   const [cmykMode, setCmykMode] = useState(false);
   const [showCropMarks, setShowCropMarks] = useState(true);
+
+  const handleCustomFontFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        if (evt.target?.result) {
+          const cleanFontName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9]/g, "_");
+          try {
+            const fontFace = new FontFace(cleanFontName, evt.target.result);
+            const loadedFace = await fontFace.load();
+            document.fonts.add(loadedFace);
+            setHeadlineFont(cleanFontName);
+          } catch (err) {
+            console.error("Failed to load custom font file:", err);
+          }
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+    if (e.target) {
+      e.target.value = '';
+    }
+  };
 
   const handleCustomImageUpload = (e) => {
     const file = e.target.files?.[0];
@@ -282,36 +339,104 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
           {/* Font Controls */}
           <div style={{ marginBottom: '24px' }}>
             <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
-              FONT PAIRING & ALIGNMENT
+              TYPOGRAPHY & GOOGLE FONTS (17+ PRESETS)
             </label>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '10px' }}>
               <div>
                 <span style={{ fontSize: '10px', color: '#64748B' }}>Headline Font</span>
                 <select
                   value={headlineFont}
-                  onChange={(e) => setHeadlineFont(e.target.value)}
-                  style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
+                  onChange={(e) => {
+                    setHeadlineFont(e.target.value);
+                    loadGoogleFont(e.target.value);
+                  }}
+                  style={{ width: '100%', padding: '8px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px', marginBottom: '4px' }}
                 >
-                  <option value="Syne">Syne (Display)</option>
-                  <option value="Playfair Display">Playfair Display (Serif)</option>
-                  <option value="Space Grotesk">Space Grotesk (Neo-Grotesque)</option>
-                  <option value="Outfit">Outfit (Geometric)</option>
-                  <option value="Inter">Inter (Sans)</option>
+                  {FEATURED_FONTS.map(f => (
+                    <option key={f.name} value={f.name}>{f.label}</option>
+                  ))}
                 </select>
+                <input
+                  type="text"
+                  placeholder="Or type any custom Google Font name..."
+                  value={headlineFont}
+                  onChange={(e) => {
+                    setHeadlineFont(e.target.value);
+                    loadGoogleFont(e.target.value);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '6px 8px',
+                    borderRadius: '4px',
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    color: '#00DFD8',
+                    fontSize: '11px'
+                  }}
+                />
+
+                <input
+                  type="file"
+                  ref={fontFileInputRef}
+                  accept=".ttf,.otf,.woff,.woff2"
+                  onChange={handleCustomFontFileUpload}
+                  style={{ display: 'none' }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => fontFileInputRef.current?.click()}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    marginTop: '6px',
+                    borderRadius: '6px',
+                    background: 'rgba(0, 223, 216, 0.12)',
+                    border: '1px dashed rgba(0, 223, 216, 0.4)',
+                    color: '#00DFD8',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Type style={{ width: '13px', height: '13px' }} /> Upload Custom Font File (.TTF / .OTF)
+                </button>
               </div>
 
-              <div>
-                <span style={{ fontSize: '10px', color: '#64748B' }}>Alignment</span>
-                <select
-                  value={align}
-                  onChange={(e) => setAlign(e.target.value)}
-                  style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
-                >
-                  <option value="left">Left</option>
-                  <option value="center">Center</option>
-                  <option value="right">Right</option>
-                </select>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
+                <div>
+                  <span style={{ fontSize: '10px', color: '#64748B' }}>Subtitle Font</span>
+                  <select
+                    value={subFont}
+                    onChange={(e) => {
+                      setSubFont(e.target.value);
+                      loadGoogleFont(e.target.value);
+                    }}
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
+                  >
+                    {FEATURED_FONTS.map(f => (
+                      <option key={f.name} value={f.name}>{f.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <span style={{ fontSize: '10px', color: '#64748B' }}>Alignment</span>
+                  <select
+                    value={align}
+                    onChange={(e) => setAlign(e.target.value)}
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
+                  >
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -478,7 +603,7 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
             <div style={{ position: 'relative', zIndex: 10, textAlign: align, margin: '20px 0' }}>
               <h2
                 style={{
-                  fontFamily: `var(--font-${headlineFont.toLowerCase().replace(' ', '')})`,
+                  fontFamily: `'${headlineFont}', sans-serif, serif`,
                   fontSize: activeFormat.id === 'business-card' ? '24px' : '36px',
                   fontWeight: '800',
                   color: primaryColor,
@@ -493,7 +618,7 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
 
               <p
                 style={{
-                  fontFamily: `var(--font-${subFont.toLowerCase().replace(' ', '')})`,
+                  fontFamily: `'${subFont}', sans-serif, serif`,
                   fontSize: activeFormat.id === 'business-card' ? '12px' : '15px',
                   fontWeight: '500',
                   color: secondaryColor,
