@@ -235,7 +235,7 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
             </select>
           </div>
 
-          {/* Text Content Inputs */}
+          {/* Text Content Inputs & Typography Controls */}
           <div style={{ marginBottom: '24px' }}>
             <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
               TYPOGRAPHY & CONTENT
@@ -279,6 +279,75 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
                 />
               </div>
 
+              {/* FONT SELECTOR DIRECTLY UNDER TYPOGRAPHY & CONTENT */}
+              <div style={{ background: 'rgba(0, 223, 216, 0.08)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(0, 223, 216, 0.25)' }}>
+                <span style={{ fontSize: '11px', color: '#00DFD8', fontWeight: '700', display: 'block', marginBottom: '6px' }}>
+                  🔤 Headline Font Style & Custom Fonts
+                </span>
+                <select
+                  value={headlineFont}
+                  onChange={(e) => {
+                    setHeadlineFont(e.target.value);
+                    loadGoogleFont(e.target.value);
+                  }}
+                  style={{ width: '100%', padding: '8px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px', marginBottom: '6px' }}
+                >
+                  {FEATURED_FONTS.map(f => (
+                    <option key={f.name} value={f.name}>{f.label}</option>
+                  ))}
+                </select>
+
+                <input
+                  type="text"
+                  placeholder="Or type any custom Google Font name..."
+                  value={headlineFont}
+                  onChange={(e) => {
+                    setHeadlineFont(e.target.value);
+                    loadGoogleFont(e.target.value);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '6px 8px',
+                    borderRadius: '4px',
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    color: '#00DFD8',
+                    fontSize: '11px',
+                    marginBottom: '6px'
+                  }}
+                />
+
+                <input
+                  type="file"
+                  ref={fontFileInputRef}
+                  accept=".ttf,.otf,.woff,.woff2"
+                  onChange={handleCustomFontFileUpload}
+                  style={{ display: 'none' }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => fontFileInputRef.current?.click()}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    borderRadius: '6px',
+                    background: 'rgba(0, 223, 216, 0.15)',
+                    border: '1px dashed rgba(0, 223, 216, 0.5)',
+                    color: '#00DFD8',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Type style={{ width: '13px', height: '13px' }} /> Upload Custom Font File (.TTF / .OTF)
+                </button>
+              </div>
+
               <div>
                 <span style={{ fontSize: '10px', color: '#64748B' }}>Subtitle</span>
                 <input
@@ -295,6 +364,37 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
                     fontSize: '12px'
                   }}
                 />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
+                <div>
+                  <span style={{ fontSize: '10px', color: '#64748B' }}>Subtitle Font</span>
+                  <select
+                    value={subFont}
+                    onChange={(e) => {
+                      setSubFont(e.target.value);
+                      loadGoogleFont(e.target.value);
+                    }}
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
+                  >
+                    {FEATURED_FONTS.map(f => (
+                      <option key={f.name} value={f.name}>{f.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <span style={{ fontSize: '10px', color: '#64748B' }}>Alignment</span>
+                  <select
+                    value={align}
+                    onChange={(e) => setAlign(e.target.value)}
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
+                  >
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -332,111 +432,6 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
                     fontWeight: '700'
                   }}
                 />
-              </div>
-            </div>
-          </div>
-
-          {/* Font Controls */}
-          <div style={{ marginBottom: '24px' }}>
-            <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
-              TYPOGRAPHY & GOOGLE FONTS (17+ PRESETS)
-            </label>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '10px' }}>
-              <div>
-                <span style={{ fontSize: '10px', color: '#64748B' }}>Headline Font</span>
-                <select
-                  value={headlineFont}
-                  onChange={(e) => {
-                    setHeadlineFont(e.target.value);
-                    loadGoogleFont(e.target.value);
-                  }}
-                  style={{ width: '100%', padding: '8px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px', marginBottom: '4px' }}
-                >
-                  {FEATURED_FONTS.map(f => (
-                    <option key={f.name} value={f.name}>{f.label}</option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  placeholder="Or type any custom Google Font name..."
-                  value={headlineFont}
-                  onChange={(e) => {
-                    setHeadlineFont(e.target.value);
-                    loadGoogleFont(e.target.value);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '6px 8px',
-                    borderRadius: '4px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: '#00DFD8',
-                    fontSize: '11px'
-                  }}
-                />
-
-                <input
-                  type="file"
-                  ref={fontFileInputRef}
-                  accept=".ttf,.otf,.woff,.woff2"
-                  onChange={handleCustomFontFileUpload}
-                  style={{ display: 'none' }}
-                />
-
-                <button
-                  type="button"
-                  onClick={() => fontFileInputRef.current?.click()}
-                  style={{
-                    width: '100%',
-                    padding: '6px 10px',
-                    marginTop: '6px',
-                    borderRadius: '6px',
-                    background: 'rgba(0, 223, 216, 0.12)',
-                    border: '1px dashed rgba(0, 223, 216, 0.4)',
-                    color: '#00DFD8',
-                    fontSize: '11px',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <Type style={{ width: '13px', height: '13px' }} /> Upload Custom Font File (.TTF / .OTF)
-                </button>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#64748B' }}>Subtitle Font</span>
-                  <select
-                    value={subFont}
-                    onChange={(e) => {
-                      setSubFont(e.target.value);
-                      loadGoogleFont(e.target.value);
-                    }}
-                    style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
-                  >
-                    {FEATURED_FONTS.map(f => (
-                      <option key={f.name} value={f.name}>{f.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <span style={{ fontSize: '10px', color: '#64748B' }}>Alignment</span>
-                  <select
-                    value={align}
-                    onChange={(e) => setAlign(e.target.value)}
-                    style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
-                  >
-                    <option value="left">Left</option>
-                    <option value="center">Center</option>
-                    <option value="right">Right</option>
-                  </select>
-                </div>
               </div>
             </div>
           </div>
