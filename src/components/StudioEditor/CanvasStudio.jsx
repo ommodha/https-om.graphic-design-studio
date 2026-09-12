@@ -436,49 +436,77 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
             </div>
           </div>
 
-          {/* Color Scheme Picker */}
-          <div>
-            <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
-              COLOR SWATCHES
+          {/* Crisp High-Contrast Color Scheme Picker */}
+          <div style={{ marginBottom: '24px' }}>
+            <label className="font-space" style={{ fontSize: '13px', color: '#00DFD8', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+              <Palette style={{ width: '15px', height: '15px', color: '#00DFD8' }} /> COLOR SWATCHES & PALETTES
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '12px' }}>
-              <div>
-                <span style={{ fontSize: '9px', color: '#64748B' }}>Primary</span>
-                <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} style={{ width: '100%', height: '30px', cursor: 'pointer' }} />
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '14px' }}>
+              <div style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <span style={{ fontSize: '11px', color: '#FFF', fontWeight: '700', display: 'block' }}>Primary</span>
+                  <span style={{ fontSize: '10px', color: '#00DFD8', fontFamily: 'monospace', fontWeight: '700' }}>{primaryColor.toUpperCase()}</span>
+                </div>
+                <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} style={{ width: '32px', height: '32px', border: '2px solid rgba(255,255,255,0.4)', borderRadius: '6px', cursor: 'pointer', background: 'none' }} />
               </div>
-              <div>
-                <span style={{ fontSize: '9px', color: '#64748B' }}>Secondary</span>
-                <input type="color" value={secondaryColor} onChange={(e) => setSecondaryColor(e.target.value)} style={{ width: '100%', height: '30px', cursor: 'pointer' }} />
+
+              <div style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <span style={{ fontSize: '11px', color: '#FFF', fontWeight: '700', display: 'block' }}>Secondary</span>
+                  <span style={{ fontSize: '10px', color: '#FF0080', fontFamily: 'monospace', fontWeight: '700' }}>{secondaryColor.toUpperCase()}</span>
+                </div>
+                <input type="color" value={secondaryColor} onChange={(e) => setSecondaryColor(e.target.value)} style={{ width: '32px', height: '32px', border: '2px solid rgba(255,255,255,0.4)', borderRadius: '6px', cursor: 'pointer', background: 'none' }} />
               </div>
-              <div>
-                <span style={{ fontSize: '9px', color: '#64748B' }}>Background</span>
-                <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} style={{ width: '100%', height: '30px', cursor: 'pointer' }} />
+
+              <div style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <span style={{ fontSize: '11px', color: '#FFF', fontWeight: '700', display: 'block' }}>Background</span>
+                  <span style={{ fontSize: '10px', color: '#CBD5E1', fontFamily: 'monospace', fontWeight: '700' }}>{bgColor.toUpperCase()}</span>
+                </div>
+                <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} style={{ width: '32px', height: '32px', border: '2px solid rgba(255,255,255,0.4)', borderRadius: '6px', cursor: 'pointer', background: 'none' }} />
               </div>
-              <div>
-                <span style={{ fontSize: '9px', color: '#64748B' }}>Accent</span>
-                <input type="color" value={accentColor} onChange={(e) => setAccentColor(e.target.value)} style={{ width: '100%', height: '30px', cursor: 'pointer' }} />
+
+              <div style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <span style={{ fontSize: '11px', color: '#FFF', fontWeight: '700', display: 'block' }}>Accent</span>
+                  <span style={{ fontSize: '10px', color: '#D4AF37', fontFamily: 'monospace', fontWeight: '700' }}>{accentColor.toUpperCase()}</span>
+                </div>
+                <input type="color" value={accentColor} onChange={(e) => setAccentColor(e.target.value)} style={{ width: '32px', height: '32px', border: '2px solid rgba(255,255,255,0.4)', borderRadius: '6px', cursor: 'pointer', background: 'none' }} />
               </div>
             </div>
 
-            {/* Quick Color Palette Presets */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {/* Clear Brand Color Palette Cards */}
+            <div style={{ fontSize: '10px', color: '#94A3B8', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.5px' }}>
+              PRO COLOR PALETTE PRESETS:
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               {COLOR_PALETTES.map((pal, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => applyPalette(pal)}
-                  title={pal.name}
                   style={{
+                    padding: '8px',
+                    borderRadius: '8px',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    cursor: 'pointer',
                     display: 'flex',
-                    padding: '3px',
-                    borderRadius: '6px',
-                    background: 'rgba(255,255,255,0.1)',
-                    border: 'none',
-                    cursor: 'pointer'
+                    flexDirection: 'column',
+                    gap: '6px',
+                    textAlign: 'left'
                   }}
                 >
-                  <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: pal.primary }} />
-                  <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: pal.secondary }} />
-                  <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: pal.background }} />
+                  <span style={{ fontSize: '10px', color: '#FFF', fontWeight: '700', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {pal.name}
+                  </span>
+                  <div style={{ display: 'flex', gap: '3px' }}>
+                    <span style={{ flex: 1, height: '14px', borderRadius: '3px', background: pal.primary, border: '1px solid rgba(255,255,255,0.2)' }} />
+                    <span style={{ flex: 1, height: '14px', borderRadius: '3px', background: pal.secondary, border: '1px solid rgba(255,255,255,0.2)' }} />
+                    <span style={{ flex: 1, height: '14px', borderRadius: '3px', background: pal.background, border: '1px solid rgba(255,255,255,0.2)' }} />
+                    <span style={{ flex: 1, height: '14px', borderRadius: '3px', background: pal.accent, border: '1px solid rgba(255,255,255,0.2)' }} />
+                  </div>
                 </button>
               ))}
             </div>
