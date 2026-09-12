@@ -1,17 +1,38 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Download, CheckCircle2, FileText, X, Sparkles, Printer } from 'lucide-react';
+import { Download, CheckCircle2, FileText, X, Sparkles, Printer, Smartphone } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
 export default function ExportModal({ exportType, onClose, currentDesign }) {
+  const [deferredPrompt, setDeferredPrompt] = React.useState(null);
+
   useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
     // Trigger celebratory confetti on export completion
     confetti({
       particleCount: 80,
       spread: 70,
       origin: { y: 0.6 }
     });
+
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
   }, []);
+
+  const handleInstallApp = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      console.log('App install outcome:', choice);
+      setDeferredPrompt(null);
+    } else {
+      alert("📱 Mobile App Download & Install Guide:\n\n• Android (Chrome): Tap menu (⋮) -> 'Add to Home screen' or 'Install App'\n• iPhone (Safari): Tap Share button (⎋) -> 'Add to Home Screen'\n\nThis installs Om Graphic Studio directly onto your mobile phone!");
+    }
+  };
 
   const [downloading, setDownloading] = React.useState(false);
   const [downloadSuccess, setDownloadSuccess] = React.useState(false);
@@ -135,7 +156,7 @@ export default function ExportModal({ exportType, onClose, currentDesign }) {
           Your graphic artwork has been rendered at 3x ultra resolution with exact color profiles and vector crispness.
         </p>
 
-        <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '16px', borderRadius: '12px', marginBottom: '28px', textAlign: 'left' }}>
+        <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '16px', borderRadius: '12px', marginBottom: '20px', textAlign: 'left' }}>
           <div style={{ fontSize: '12px', color: '#00DFD8', fontWeight: '700', marginBottom: '8px' }}>
             EXPORT PACKAGE SUMMARY
           </div>
@@ -149,6 +170,30 @@ export default function ExportModal({ exportType, onClose, currentDesign }) {
             • Print Bleed & Trim Guides: <strong>Embedded Metadata</strong>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={handleInstallApp}
+          className="font-space"
+          style={{
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            background: 'rgba(0, 223, 216, 0.15)',
+            border: '1px solid rgba(0, 223, 216, 0.4)',
+            color: '#00DFD8',
+            fontWeight: '700',
+            fontSize: '13px',
+            cursor: 'pointer',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}
+        >
+          <Smartphone style={{ width: '16px', height: '16px' }} /> 📱 Download & Install Mobile App on Phone
+        </button>
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button

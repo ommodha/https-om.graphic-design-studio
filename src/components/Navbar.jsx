@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Palette, Edit3, Image, Layers, Printer, Sparkles, Download, Menu, X } from 'lucide-react';
+import { Palette, Edit3, Image, Layers, Printer, Sparkles, Download, Menu, X, Smartphone } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, onQuickExport }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -128,35 +128,63 @@ export default function Navbar({ activeTab, setActiveTab, onQuickExport }) {
           })}
         </nav>
 
-        {/* Quick Export Button */}
-        <button
-          type="button"
-          onClick={() => {
-            console.log('Quick Export clicked');
-            onQuickExport();
-          }}
-          className="font-space"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '9px 18px',
-            borderRadius: '10px',
-            background: 'linear-gradient(135deg, #00DFD8 0%, #0066FF 100%)',
-            color: '#000',
-            fontWeight: '700',
-            fontSize: '13px',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 15px rgba(0, 223, 216, 0.3)',
-            transition: 'transform 0.15s ease'
-          }}
-          onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.96)'}
-          onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-        >
-          <Download style={{ width: '15px', height: '15px' }} />
-          Export Graphic Design
-        </button>
+        {/* Quick Export & App Download Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => {
+              console.log('Quick Export clicked');
+              onQuickExport();
+            }}
+            className="font-space"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '9px 16px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #00DFD8 0%, #0066FF 100%)',
+              color: '#000',
+              fontWeight: '700',
+              fontSize: '13px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(0, 223, 216, 0.3)',
+              transition: 'transform 0.15s ease'
+            }}
+            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.96)'}
+            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <Download style={{ width: '15px', height: '15px' }} />
+            Export Graphic Design
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              onQuickExport();
+            }}
+            title="Download & Install Mobile App on Phone"
+            className="font-space"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '9px 14px',
+              borderRadius: '10px',
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              color: '#FFF',
+              fontWeight: '700',
+              fontSize: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Smartphone style={{ width: '14px', height: '14px', color: '#00DFD8' }} />
+            App Download
+          </button>
+        </div>
 
       </div>
     </header>
