@@ -96,7 +96,7 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
   };
 
   // Form State
-  const [headline, setHeadline] = useState(currentDesign?.title || "ANTIGRAVITY DESIGN");
+  const [headline, setHeadline] = useState(currentDesign?.title || "PRO DESIGN STUDIO");
   const [subtitle, setSubtitle] = useState(currentDesign?.subtitle || "DIGITAL & PRINT CREATIVE SUITE");
   const [tagline, setTagline] = useState(currentDesign?.tagline || "300 DPI PRE-FLIGHT • SWISS GRID ENGINE 2026");
   const [badgeText, setBadgeText] = useState(currentDesign?.badge || "PRO GRAPHIC EDITION");

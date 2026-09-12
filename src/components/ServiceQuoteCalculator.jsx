@@ -32,7 +32,7 @@ export default function ServiceQuoteCalculator() {
 
   const handleDownloadInvoice = () => {
     const invoiceContent = `================================================
-  ANTIGRAVITY DESIGN STUDIO - DOLLAR QUOTE INVOICE
+  OM DESIGN STUDIO - DOLLAR QUOTE INVOICE
 ================================================
 Client Name: ${clientName}
 Date: ${new Date().toLocaleDateString()}

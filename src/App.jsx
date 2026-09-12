@@ -113,7 +113,7 @@ export default function App() {
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div className="font-syne" style={{ fontSize: '16px', fontWeight: '800', color: '#FFF' }}>
-              ANTIGRAVITY<span style={{ color: '#00DFD8' }}>.DESIGN STUDIO</span>
+              OM<span style={{ color: '#00DFD8' }}>.DESIGN STUDIO</span>
             </div>
             <div style={{ fontSize: '12px', color: '#64748B', marginTop: '4px' }}>
               Creative & Professional Graphic Designs for Digital & Print Media © 2026
