@@ -436,10 +436,10 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
             {bgImage && (
               <div style={{
                 position: 'absolute',
-                inset: 0,
+                inset: '-24px',
                 backgroundImage: `url(${bgImage})`,
                 backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundPosition: 'center 35%',
                 opacity: overlayOpacity,
                 pointerEvents: 'none'
               }} />
@@ -450,13 +450,13 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
               <div className="print-safety-guide" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
             )}
 
-            {/* TOP BAR: Badge & Accent Mark */}
+            {/* TOP BAR: Badge */}
             <div style={{
               position: 'relative',
               zIndex: 10,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'space-between'
+              justifyContent: align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'
             }}>
               {badgeText && (
                 <span className="font-space" style={{
@@ -472,8 +472,6 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
                   {badgeText}
                 </span>
               )}
-
-              <div style={{ width: '32px', height: '4px', borderRadius: '2px', background: accentColor }} />
             </div>
 
             {/* CENTER: Main Headline & Subtitle */}
