@@ -39,6 +39,7 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
   const [subtitle, setSubtitle] = useState(currentDesign?.subtitle || "DIGITAL & PRINT CREATIVE SUITE");
   const [tagline, setTagline] = useState(currentDesign?.tagline || "300 DPI PRE-FLIGHT • SWISS GRID ENGINE 2026");
   const [badgeText, setBadgeText] = useState(currentDesign?.badge || "PRO GRAPHIC EDITION");
+  const [logoMarkText, setLogoMarkText] = useState("OM.DESIGN STUDIO");
 
   const [headlineFont, setHeadlineFont] = useState(currentDesign?.headlineFont || "Syne");
   const [subFont, setSubFont] = useState(currentDesign?.subFont || "Space Grotesk");
@@ -249,6 +250,25 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     color: '#FFF',
                     fontSize: '11px'
+                  }}
+                />
+              </div>
+
+              <div>
+                <span style={{ fontSize: '10px', color: '#00DFD8' }}>Corner Brand Logo Text</span>
+                <input
+                  type="text"
+                  value={logoMarkText}
+                  onChange={(e) => setLogoMarkText(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    borderRadius: '6px',
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    border: '1px solid rgba(0, 223, 216, 0.3)',
+                    color: '#FFF',
+                    fontSize: '11px',
+                    fontWeight: '700'
                   }}
                 />
               </div>
@@ -497,9 +517,24 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
                 {tagline}
               </span>
 
-              <span className="font-space" style={{ fontSize: '9px', color: accentColor, fontWeight: '700' }}>
-                {activeFormat.displaySize}
-              </span>
+              {logoMarkText && (
+                <span className="font-space" style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontSize: '10px',
+                  fontWeight: '800',
+                  color: primaryColor,
+                  background: 'rgba(0, 0, 0, 0.45)',
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  border: `1px solid ${accentColor}40`,
+                  letterSpacing: '0.5px'
+                }}>
+                  <Sparkles style={{ width: '11px', height: '11px', color: accentColor }} />
+                  {logoMarkText}
+                </span>
+              )}
             </div>
           </div>
         </div>
