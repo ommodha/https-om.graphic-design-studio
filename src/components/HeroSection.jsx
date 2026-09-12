@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sparkles, Layers, Printer, Monitor, CheckCircle2, ArrowRight, Palette } from 'lucide-react';
+import heroBrandingImg from '../assets/hero_branding_art_1789199298688.png';
 
 export default function HeroSection({ onOpenStudio, onOpenMockup }) {
   return (
@@ -130,7 +131,7 @@ export default function HeroSection({ onOpenStudio, onOpenMockup }) {
               border: '1px solid rgba(255, 255, 255, 0.15)'
             }}>
               <img
-                src="/assets/hero_branding_art_1789199298688.png"
+                src={heroBrandingImg}
                 alt="Graphic Design Hero Artwork"
                 style={{ width: '100%', height: '420px', objectFit: 'cover', display: 'block' }}
               />

@@ -23,7 +23,7 @@ export default function PortfolioGallery({ onSelectDesignForEditor, onSelectForM
   return (
     <section style={{ padding: '0 24px 48px' }}>
       {/* Category Filter Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
+      <div className="grid-mobile-stack" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '28px' }}>
         <div>
           <h2 className="font-syne" style={{ fontSize: '28px', fontWeight: '800', color: '#FFF' }}>
             Graphic Design Showcase
@@ -33,7 +33,7 @@ export default function PortfolioGallery({ onSelectDesignForEditor, onSelectForM
           </p>
         </div>
 
-        <div className="glass-panel" style={{ display: 'flex', gap: '6px', padding: '6px' }}>
+        <div className="glass-panel" style={{ display: 'flex', gap: '6px', padding: '6px', overflowX: 'auto', maxWidth: '100%', flexWrap: 'wrap' }}>
           {[
             { id: 'all', label: 'All Projects', icon: Sparkles },
             { id: 'print', label: 'Print Collateral', icon: Printer },
@@ -50,15 +50,16 @@ export default function PortfolioGallery({ onSelectDesignForEditor, onSelectForM
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px 18px',
+                  gap: '6px',
+                  padding: '8px 14px',
                   borderRadius: '10px',
                   background: isActive ? 'linear-gradient(135deg, #00DFD8 0%, #0066FF 100%)' : 'transparent',
                   color: isActive ? '#000' : '#94A3B8',
-                  fontSize: '13px',
+                  fontSize: '12px',
                   fontWeight: isActive ? '700' : '500',
                   border: 'none',
                   cursor: 'pointer',
+                  whiteSpace: 'nowrap',
                   transition: 'all 0.2s ease'
                 }}
               >

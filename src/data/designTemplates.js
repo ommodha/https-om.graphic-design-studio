@@ -1,3 +1,8 @@
+import brandIdentityImg from '../assets/brand_identity_collateral_1789199524359.png';
+import swissPosterImg from '../assets/swiss_poster_design_1789199320446.png';
+import digitalCampaignImg from '../assets/digital_social_campaign_1789199592437.png';
+import heroBrandingImg from '../assets/hero_branding_art_1789199298688.png';
+
 export const MEDIA_FORMATS = [
   // DIGITAL FORMATS
   {
@@ -58,10 +63,9 @@ export const MEDIA_FORMATS = [
     heightMm: 297,
     bleedMm: 3,
     dpi: 300,
-    unitLabel: "mm",
-    displaySize: "210 x 297 mm @ 300 DPI",
+    displaySize: "210 x 297 mm (300 DPI)",
     icon: "FileText",
-    description: "Standard print poster format with 3mm outer bleed and safety margins."
+    description: "International standard poster format with 3mm outer bleed and trim marks."
   },
   {
     id: "business-card",
@@ -71,42 +75,39 @@ export const MEDIA_FORMATS = [
     heightMm: 55,
     bleedMm: 3,
     dpi: 300,
-    unitLabel: "mm",
-    displaySize: "85 x 55 mm @ 300 DPI",
+    displaySize: "85 x 55 mm (300 DPI)",
     icon: "CreditCard",
-    description: "Standard European/US executive business card with trim lines."
+    description: "Premium double-sided card layout with spot UV & gold foil stamping guides."
   },
   {
-    id: "tri-fold",
-    name: "Tri-Fold Corporate Brochure",
+    id: "trifold-brochure",
+    name: "Tri-Fold Brochure",
     category: "print",
     widthMm: 297,
     heightMm: 210,
     bleedMm: 3,
     dpi: 300,
-    unitLabel: "mm",
-    displaySize: "297 x 210 mm (3 Panels)",
+    displaySize: "297 x 210 mm (300 DPI)",
     icon: "BookOpen",
-    description: "3-panel marketing brochure layout with folding line indicators."
+    description: "3-panel folded marketing brochure with fold line guides."
   },
   {
     id: "billboard",
-    name: "Urban Highway Billboard",
+    name: "Highway Billboard",
     category: "print",
-    widthMm: 1200,
-    heightMm: 400,
-    bleedMm: 10,
+    widthMm: 12000,
+    heightMm: 3000,
+    bleedMm: 50,
     dpi: 150,
-    unitLabel: "cm",
-    displaySize: "12 x 4 m Display",
+    displaySize: "12m x 3m Wide Format",
     icon: "Maximize",
-    description: "Large scale outdoor billboard mock design for maximum public impact."
+    description: "Ultra wide-format outdoor advertising billboard."
   }
 ];
 
-export const DESIGN_TEMPLATES = [
+export const STARTER_TEMPLATES = [
   {
-    id: "tpl-swiss-neue",
+    id: "tpl-swiss-poster",
     title: "NEUE DESIGN BOLD",
     subtitle: "INTERNATIONAL TYPOGRAPHIC EXHIBITION",
     tagline: "FORM FOLLOWS FUNCTION • ZURICH 2026",
@@ -122,7 +123,7 @@ export const DESIGN_TEMPLATES = [
     accentColor: "#D4AF37",
     bgPattern: "grid-swiss",
     overlayOpacity: 0.1,
-    backgroundImage: "/assets/swiss_poster_design_1789199320446.png",
+    backgroundImage: swissPosterImg,
     showGrid: true,
     showBleed: true
   },
@@ -143,7 +144,7 @@ export const DESIGN_TEMPLATES = [
     accentColor: "#F4F1EA",
     bgPattern: "radial-glow",
     overlayOpacity: 0.25,
-    backgroundImage: "/assets/brand_identity_collateral_1789199524359.png",
+    backgroundImage: brandIdentityImg,
     showGrid: false,
     showBleed: true
   },
@@ -164,7 +165,7 @@ export const DESIGN_TEMPLATES = [
     accentColor: "#7928CA",
     bgPattern: "cyber-mesh",
     overlayOpacity: 0.35,
-    backgroundImage: "/assets/digital_social_campaign_1789199592437.png",
+    backgroundImage: digitalCampaignImg,
     showGrid: false,
     showBleed: false
   },
@@ -185,8 +186,10 @@ export const DESIGN_TEMPLATES = [
     accentColor: "#FF3366",
     bgPattern: "diagonal-stripes",
     overlayOpacity: 0.3,
-    backgroundImage: "/assets/hero_branding_art_1789199298688.png",
+    backgroundImage: heroBrandingImg,
     showGrid: true,
     showBleed: false
   }
 ];
+
+export const DESIGN_TEMPLATES = STARTER_TEMPLATES;

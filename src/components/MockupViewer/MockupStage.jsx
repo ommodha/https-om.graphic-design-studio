@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Layers, Monitor, CreditCard, Maximize, Check, Sparkles, RefreshCw } from 'lucide-react';
+import heroBrandingImg from '../../assets/hero_branding_art_1789199298688.png';
 
 export default function MockupStage({ activeDesign }) {
   const [mockupType, setMockupType] = useState('poster'); // 'poster', 'card', 'mobile', 'billboard'
 
-  const designImage = activeDesign?.image || activeDesign?.backgroundImage || "/assets/hero_branding_art_1789199298688.png";
+  const designImage = activeDesign?.image || activeDesign?.backgroundImage || heroBrandingImg;
   const title = activeDesign?.title || "HyperDrive Visual System";
 
   return (

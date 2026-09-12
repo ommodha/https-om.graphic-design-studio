@@ -1,3 +1,8 @@
+import brandIdentityImg from '../assets/brand_identity_collateral_1789199524359.png';
+import swissPosterImg from '../assets/swiss_poster_design_1789199320446.png';
+import digitalCampaignImg from '../assets/digital_social_campaign_1789199592437.png';
+import heroBrandingImg from '../assets/hero_branding_art_1789199298688.png';
+
 export const PORTFOLIO_ITEMS = [
   {
     id: "luxury-stationery",
@@ -6,7 +11,7 @@ export const PORTFOLIO_ITEMS = [
     subCategory: "Brand Identity & Print Collateral",
     client: "Aura Botanicals & Fine Living",
     year: "2026",
-    image: "/assets/brand_identity_collateral_1789199524359.png",
+    image: brandIdentityImg,
     description: "Complete corporate identity system including foil-stamped business cards, embossed letterheads, custom envelopes, and brand style guide.",
     tags: ["Gold Foil", "Dark Emerald", "Embossed", "Stationery", "300 DPI", "Pantone 5535C"],
     colors: ["#0B2B26", "#D4AF37", "#051614", "#F4F1EA", "#164E43"],
@@ -30,7 +35,7 @@ export const PORTFOLIO_ITEMS = [
     subCategory: "Exhibition Poster & Print",
     client: "Zurich Design Biennale",
     year: "2026",
-    image: "/assets/swiss_poster_design_1789199320446.png",
+    image: swissPosterImg,
     description: "Swiss International Style museum poster featuring rigid mathematical baseline grids, bold asymmetrical composition, and high contrast typography.",
     tags: ["Swiss Design", "Baseline Grid", "A1 Poster", "Museum Print", "Red & Black"],
     colors: ["#E63946", "#111111", "#F8F9FA", "#2B2D42", "#8D99AE"],
@@ -54,7 +59,7 @@ export const PORTFOLIO_ITEMS = [
     subCategory: "Social Media & Web Banners",
     client: "Nexus AI Systems",
     year: "2026",
-    image: "/assets/digital_social_campaign_1789199592437.png",
+    image: digitalCampaignImg,
     description: "High-impact digital marketing campaign graphics featuring 3D glassmorphic objects, neon glows, and responsive banner variants.",
     tags: ["Digital Campaign", "Instagram Story 9:16", "Web Banner", "3D Glass", "RGB Neon"],
     colors: ["#7928CA", "#FF0080", "#00DFD8", "#0A0A0C", "#1E1B2E"],
@@ -76,7 +81,7 @@ export const PORTFOLIO_ITEMS = [
     subCategory: "3D Visual System & Motion Assets",
     client: "HyperDrive Mobility",
     year: "2026",
-    image: "/assets/hero_branding_art_1789199298688.png",
+    image: heroBrandingImg,
     description: "Cutting-edge visual identity system integrating 3D metallic elements, generative vector paths, and interactive UI components.",
     tags: ["Visual Identity", "3D Graphic", "Brand Guidelines", "Digital & Print"],
     colors: ["#0066FF", "#FF3366", "#0F172A", "#F8FAFC", "#38BDF8"],

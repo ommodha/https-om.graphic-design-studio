@@ -1,6 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { MEDIA_FORMATS, DESIGN_TEMPLATES } from '../../data/designTemplates';
 import { COLOR_PALETTES } from '../../data/brandPresets';
+import brandIdentityImg from '../../assets/brand_identity_collateral_1789199524359.png';
+import swissPosterImg from '../../assets/swiss_poster_design_1789199320446.png';
+import digitalCampaignImg from '../../assets/digital_social_campaign_1789199592437.png';
+import heroBrandingImg from '../../assets/hero_branding_art_1789199298688.png';
 import {
   Type, Palette, Layout, Settings, Printer, Eye, Download, Sparkles,
   Sliders, Grid, ShieldAlert, FileText, CheckCircle2, Image as ImageIcon, RotateCcw, Upload
@@ -50,7 +54,7 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
   const [bgColor, setBgColor] = useState(currentDesign?.bgColor || "#0A0A0C");
   const [accentColor, setAccentColor] = useState(currentDesign?.accentColor || "#D4AF37");
 
-  const [bgImage, setBgImage] = useState(currentDesign?.backgroundImage || "/assets/hero_branding_art_1789199298688.png");
+  const [bgImage, setBgImage] = useState(currentDesign?.backgroundImage || heroBrandingImg);
   const [overlayOpacity, setOverlayOpacity] = useState(currentDesign?.overlayOpacity || 0.25);
   const [bgPattern, setBgPattern] = useState(currentDesign?.bgPattern || "cyber-mesh");
 
@@ -689,7 +693,7 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
 
                   <button
                     type="button"
-                    onClick={() => setBgImage('/assets/hero_branding_art_1789199298688.png')}
+                    onClick={() => setBgImage(heroBrandingImg)}
                     style={{
                       padding: '8px 12px',
                       borderRadius: '6px',
@@ -738,10 +742,10 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
               {[
-                { name: 'Futuristic 3D', url: '/assets/hero_branding_art_1789199298688.png' },
-                { name: 'Swiss Typo', url: '/assets/swiss_poster_design_1789199320446.png' },
-                { name: 'Brand Foil', url: '/assets/brand_identity_collateral_1789199524359.png' },
-                { name: 'Cyber Neon', url: '/assets/digital_social_campaign_1789199592437.png' }
+                { name: 'Futuristic 3D', url: heroBrandingImg },
+                { name: 'Swiss Typo', url: swissPosterImg },
+                { name: 'Brand Foil', url: brandIdentityImg },
+                { name: 'Cyber Neon', url: digitalCampaignImg }
               ].map((img, i) => (
                 <button
                   key={i}
