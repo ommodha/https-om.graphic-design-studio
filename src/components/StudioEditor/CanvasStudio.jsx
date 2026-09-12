@@ -22,9 +22,15 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
       reader.onload = (evt) => {
         if (evt.target?.result) {
           setBgImage(evt.target.result);
+          // Set opacity high so the uploaded photo is clearly visible
+          setOverlayOpacity(0.85);
         }
       };
       reader.readAsDataURL(file);
+    }
+    // Reset file input so picking the same or another file always fires onChange
+    if (e.target) {
+      e.target.value = '';
     }
   };
 
@@ -608,7 +614,7 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
               ARTWORK OVERLAY & CUSTOM PHOTO
             </label>
 
-            {/* Custom Photo File Uploader Button */}
+            {/* Custom Photo File Uploader Input */}
             <input
               type="file"
               ref={fileInputRef}
@@ -617,30 +623,79 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
               onChange={handleCustomImageUpload}
             />
 
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="font-space"
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #FF0080 0%, #7928CA 100%)',
-                color: '#FFF',
-                fontWeight: '700',
-                fontSize: '12px',
-                border: 'none',
-                cursor: 'pointer',
-                marginBottom: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                boxShadow: '0 4px 15px rgba(255, 0, 128, 0.3)'
-              }}
-            >
-              <Upload style={{ width: '16px', height: '16px' }} /> Upload Your Own Photo / Picture
-            </button>
+            {bgImage?.startsWith('data:image') ? (
+              <div style={{ background: 'rgba(0, 223, 216, 0.12)', border: '1px solid #00DFD8', padding: '12px', borderRadius: '10px', marginBottom: '12px' }}>
+                <div style={{ fontSize: '11px', color: '#00DFD8', fontWeight: '700', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <ImageIcon style={{ width: '14px', height: '14px' }} /> Custom Photo Active on Canvas
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      borderRadius: '6px',
+                      background: 'linear-gradient(135deg, #00DFD8 0%, #0066FF 100%)',
+                      color: '#000',
+                      fontWeight: '700',
+                      fontSize: '11px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <RotateCcw style={{ width: '12px', height: '12px' }} /> Change / Replace Photo
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setBgImage('/assets/hero_branding_art_1789199298688.png')}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      background: 'rgba(230, 57, 70, 0.2)',
+                      border: '1px solid rgba(230, 57, 70, 0.4)',
+                      color: '#E63946',
+                      fontWeight: '700',
+                      fontSize: '11px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Remove Photo
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="font-space"
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #FF0080 0%, #7928CA 100%)',
+                  color: '#FFF',
+                  fontWeight: '800',
+                  fontSize: '12px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginBottom: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 15px rgba(255, 0, 128, 0.3)'
+                }}
+              >
+                <Upload style={{ width: '16px', height: '16px' }} /> Upload Your Own Photo / Picture
+              </button>
+            )}
 
             <div style={{ fontSize: '10px', color: '#64748B', marginBottom: '6px' }}>
               OR CHOOSE SAMPLE ARTWORK:
