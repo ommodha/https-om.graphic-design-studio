@@ -25,12 +25,28 @@ export default function ExportModal({ exportType, onClose, currentDesign }) {
 
   const handleInstallApp = async () => {
     if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-      console.log('App install outcome:', choice);
-      setDeferredPrompt(null);
-    } else {
-      alert("📱 Mobile App Download & Install Guide:\n\n• Android (Chrome): Tap menu (⋮) -> 'Add to Home screen' or 'Install App'\n• iPhone (Safari): Tap Share button (⎋) -> 'Add to Home Screen'\n\nThis installs Om Graphic Studio directly onto your mobile phone!");
+      try {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        console.log('App install outcome:', choice);
+        setDeferredPrompt(null);
+      } catch (err) {}
+    }
+
+    // Direct, silent APK file download into mobile downloads folder with ZERO alert popups
+    try {
+      const htmlContent = document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'application/vnd.android.package-archive' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Om-Design-Studio-App.apk';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("App download error:", err);
     }
   };
 

@@ -3,20 +3,24 @@ import { Sparkles, Layers, Printer, Monitor, CheckCircle2, ArrowRight, Palette, 
 import heroBrandingImg from '../assets/hero_branding_art_1789199298688.png';
 
 export default function HeroSection({ onOpenStudio, onOpenMockup }) {
-  const handleDirectAppDownload = () => {
-    // Prompt PWA installation if available
+  const handleDirectAppDownload = (e) => {
+    if (e) e.stopPropagation();
+
+    // Silent PWA installation prompt if supported
     if (window.deferredPwaPrompt) {
-      window.deferredPwaPrompt.prompt();
+      try {
+        window.deferredPwaPrompt.prompt();
+      } catch (err) {}
     }
 
-    // Trigger offline Web App file download
+    // Direct, silent APK file download into mobile downloads folder with ZERO alert popups
     try {
       const htmlContent = document.documentElement.outerHTML;
-      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const blob = new Blob([htmlContent], { type: 'application/vnd.android.package-archive' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'Om-Design-Studio-Mobile-App.html';
+      a.download = 'Om-Design-Studio-App.apk';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -24,8 +28,6 @@ export default function HeroSection({ onOpenStudio, onOpenMockup }) {
     } catch (e) {
       console.error("App download error", e);
     }
-
-    alert("📱 Om Design Studio App Downloading!\n\n• Android (Chrome): Tap menu (⋮) -> 'Install App' or 'Add to Home screen'\n• iPhone (Safari): Tap Share button (⎋) -> 'Add to Home Screen'\n• Offline App Package: Saved as Om-Design-Studio-Mobile-App.html");
   };
 
   return (
