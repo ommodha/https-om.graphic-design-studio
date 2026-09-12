@@ -1,8 +1,33 @@
 import React from 'react';
-import { Sparkles, Layers, Printer, Monitor, CheckCircle2, ArrowRight, Palette } from 'lucide-react';
+import { Sparkles, Layers, Printer, Monitor, CheckCircle2, ArrowRight, Palette, Smartphone } from 'lucide-react';
 import heroBrandingImg from '../assets/hero_branding_art_1789199298688.png';
 
 export default function HeroSection({ onOpenStudio, onOpenMockup }) {
+  const handleDirectAppDownload = () => {
+    // Prompt PWA installation if available
+    if (window.deferredPwaPrompt) {
+      window.deferredPwaPrompt.prompt();
+    }
+
+    // Trigger offline Web App file download
+    try {
+      const htmlContent = document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Om-Design-Studio-Mobile-App.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("App download error", e);
+    }
+
+    alert("📱 Om Design Studio App Downloading!\n\n• Android (Chrome): Tap menu (⋮) -> 'Install App' or 'Add to Home screen'\n• iPhone (Safari): Tap Share button (⎋) -> 'Add to Home Screen'\n• Offline App Package: Saved as Om-Design-Studio-Mobile-App.html");
+  };
+
   return (
     <section style={{ padding: '32px 24px 48px', position: 'relative' }}>
       <div className="glass-panel" style={{ padding: '48px 40px', position: 'relative', overflow: 'hidden' }}>
@@ -72,13 +97,36 @@ export default function HeroSection({ onOpenStudio, onOpenMockup }) {
               </button>
 
               <button
+                type="button"
+                onClick={handleDirectAppDownload}
+                className="font-space"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '14px 24px',
+                  borderRadius: '12px',
+                  background: 'rgba(0, 223, 216, 0.15)',
+                  border: '1px solid rgba(0, 223, 216, 0.5)',
+                  color: '#00DFD8',
+                  fontWeight: '700',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  boxShadow: '0 8px 25px rgba(0, 223, 216, 0.25)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <Smartphone style={{ width: '18px', height: '18px' }} /> Download Om Design Studio App
+              </button>
+
+              <button
                 onClick={onOpenMockup}
                 className="font-space"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
-                  padding: '14px 28px',
+                  padding: '14px 24px',
                   borderRadius: '12px',
                   background: 'rgba(255, 255, 255, 0.06)',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
