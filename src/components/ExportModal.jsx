@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Download, CheckCircle2, FileText, X, Sparkles, Printer, Smartphone } from 'lucide-react';
+import { Download, CheckCircle2, X, Sparkles, Smartphone } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
-export default function ExportModal({ exportType, onClose, currentDesign }) {
+export default function ExportModal({ onClose }) {
   const [deferredPrompt, setDeferredPrompt] = React.useState(null);
 
   useEffect(() => {
@@ -24,23 +24,46 @@ export default function ExportModal({ exportType, onClose, currentDesign }) {
   }, []);
 
   const handleInstallApp = async () => {
-    if (deferredPrompt) {
+    const promptToUse = deferredPrompt || window.deferredPwaPrompt;
+    if (promptToUse) {
       try {
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
+        promptToUse.prompt();
+        const choice = await promptToUse.userChoice;
         console.log('App install outcome:', choice);
         setDeferredPrompt(null);
-      } catch (err) {}
+        window.deferredPwaPrompt = null;
+        return;
+      } catch (err) {
+        console.error("PWA install error:", err);
+      }
     }
 
-    // Direct, silent APK file download into mobile downloads folder with ZERO alert popups
+    // Direct Web App Launcher HTML file download (works 100% on all phones without APK parse errors)
     try {
-      const htmlContent = document.documentElement.outerHTML;
-      const blob = new Blob([htmlContent], { type: 'application/vnd.android.package-archive' });
+      const launcherContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Om Graphic Studio App</title>
+  <meta http-equiv="refresh" content="0; url=${window.location.href}">
+  <style>
+    body { background: #08090C; color: #FFF; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+    a { color: #00DFD8; font-weight: bold; text-decoration: none; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <div>
+    <h2>Opening Om Graphic Studio...</h2>
+    <p><a href="${window.location.href}">Click here if not redirected automatically</a></p>
+  </div>
+</body>
+</html>`;
+      const blob = new Blob([launcherContent], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'Om-Design-Studio-App.apk';
+      a.download = 'Om-Graphic-Studio-App.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

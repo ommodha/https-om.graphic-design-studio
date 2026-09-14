@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Palette, Edit3, Image, Layers, Printer, Sparkles, Download, Menu, X, Smartphone } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, onQuickExport }) {
+export default function Navbar({ activeTab, setActiveTab, onQuickExport, onOpenAppInstall }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -162,7 +162,7 @@ export default function Navbar({ activeTab, setActiveTab, onQuickExport }) {
           <button
             type="button"
             onClick={() => {
-              onQuickExport();
+              if (onOpenAppInstall) onOpenAppInstall();
             }}
             title="Download & Install Mobile App on Phone"
             className="font-space"

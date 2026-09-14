@@ -5,9 +5,13 @@ import brandIdentityImg from '../../assets/brand_identity_collateral_17891995243
 import swissPosterImg from '../../assets/swiss_poster_design_1789199320446.png';
 import digitalCampaignImg from '../../assets/digital_social_campaign_1789199592437.png';
 import heroBrandingImg from '../../assets/hero_branding_art_1789199298688.png';
+import ImageFilterPlugin, { FILTER_PRESETS } from './Plugins/ImageFilterPlugin';
+import StickerAssetLibrary, { STICKER_TEMPLATES } from './Plugins/StickerAssetLibrary';
+import AiVisualGeneratorPlugin from './Plugins/AiVisualGeneratorPlugin';
+import CodeExportPlugin from './Plugins/CodeExportPlugin';
 import {
-  Type, Palette, Layout, Settings, Printer, Eye, Download, Sparkles,
-  Sliders, Grid, ShieldAlert, FileText, CheckCircle2, Image as ImageIcon, RotateCcw, Upload
+  Type, Palette, Printer, Download, Sparkles, Sliders, FileText, Image as ImageIcon, RotateCcw, Upload,
+  Tag, Wand2, Code
 } from 'lucide-react';
 
 const FEATURED_FONTS = [
@@ -42,7 +46,7 @@ const loadGoogleFont = (fontName) => {
   }
 };
 
-export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport }) {
+export default function CanvasStudio({ currentDesign, onExport }) {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const fontFileInputRef = useRef(null);
@@ -50,7 +54,11 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
   const [showBleed, setShowBleed] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
   const [cmykMode, setCmykMode] = useState(false);
-  const [showCropMarks, setShowCropMarks] = useState(true);
+
+  // Feature Plugin States
+  const [activePluginTab, setActivePluginTab] = useState('filters');
+  const [filterState, setFilterState] = useState(FILTER_PRESETS[0].filters);
+  const [activeStickers, setActiveStickers] = useState([]);
 
   const handleCustomFontFileUpload = (e) => {
     const file = e.target.files?.[0];
@@ -101,6 +109,7 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
   const [tagline, setTagline] = useState(currentDesign?.tagline || "300 DPI PRE-FLIGHT • SWISS GRID ENGINE 2026");
   const [badgeText, setBadgeText] = useState(currentDesign?.badge || "PRO GRAPHIC EDITION");
   const [logoMarkText, setLogoMarkText] = useState("OM GRAPHIC STUDIO");
+  const [logoPosition, setLogoPosition] = useState('bottom-right');
 
   const [headlineFont, setHeadlineFont] = useState(currentDesign?.headlineFont || "Syne");
   const [subFont, setSubFont] = useState(currentDesign?.subFont || "Space Grotesk");
@@ -258,6 +267,49 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
                     fontSize: '12px'
                   }}
                 />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                  <span style={{ fontSize: '10px', color: '#64748B' }}>Fixed Corner Brand Logo Text</span>
+                  <span style={{ fontSize: '9px', color: '#00DFD8', fontWeight: '700' }}>FIXED CORNER</span>
+                </div>
+                <input
+                  type="text"
+                  value={logoMarkText}
+                  onChange={(e) => setLogoMarkText(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    borderRadius: '6px',
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    border: '1px solid rgba(0, 223, 216, 0.3)',
+                    color: '#00DFD8',
+                    fontSize: '12px',
+                    fontWeight: '700'
+                  }}
+                />
+              </div>
+
+              <div>
+                <span style={{ fontSize: '10px', color: '#64748B' }}>Brand Logo Position</span>
+                <select
+                  value={logoPosition}
+                  onChange={(e) => setLogoPosition(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    borderRadius: '6px',
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    color: '#FFF',
+                    fontSize: '12px'
+                  }}
+                >
+                  <option value="bottom-right">Bottom Right Corner (Fixed)</option>
+                  <option value="bottom-left">Bottom Left Corner (Fixed)</option>
+                  <option value="top-right">Top Right Corner (Fixed)</option>
+                </select>
               </div>
 
               <div>
@@ -589,9 +641,44 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
                 backgroundSize: 'cover',
                 backgroundPosition: 'center 35%',
                 opacity: overlayOpacity,
-                pointerEvents: 'none'
+                filter: `brightness(${filterState.brightness}%) contrast(${filterState.contrast}%) saturate(${filterState.saturate}%) hue-rotate(${filterState.hueRotate}deg) sepia(${filterState.sepia}%) grayscale(${filterState.grayscale}%) invert(${filterState.invert}%) blur(${filterState.blur}px)`,
+                pointerEvents: 'none',
+                transition: 'filter 0.2s ease'
               }} />
             )}
+
+            {/* Vector Stickers Overlay Layer */}
+            {activeStickers.map((stk) => {
+              const tmpl = STICKER_TEMPLATES.find(t => t.id === stk.templateId) || STICKER_TEMPLATES[0];
+              const IconComponent = tmpl.icon;
+              return (
+                <div
+                  key={stk.id}
+                  style={{
+                    position: 'absolute',
+                    top: `${stk.top}%`,
+                    left: `${stk.left}%`,
+                    zIndex: 25,
+                    transform: `rotate(${stk.rotation}deg)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 12px',
+                    borderRadius: '99px',
+                    background: 'rgba(5, 6, 8, 0.85)',
+                    border: `1.5px solid ${stk.color}`,
+                    color: '#FFF',
+                    boxShadow: `0 4px 16px ${stk.color}60`,
+                    pointerEvents: 'none'
+                  }}
+                >
+                  <IconComponent style={{ width: '14px', height: '14px', color: stk.color }} />
+                  <span style={{ fontSize: '10px', fontWeight: '800', fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '0.5px' }}>
+                    {stk.label}
+                  </span>
+                </div>
+              );
+            })}
 
             {/* Bleed Safety Zone Marker */}
             {showBleed && isPrint && (
@@ -653,6 +740,37 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
               </p>
             </div>
 
+            {/* FIXED CORNER BRAND LOGO STAMP */}
+            {logoMarkText && (
+              <div style={{
+                position: 'absolute',
+                bottom: logoPosition?.startsWith('top') ? 'auto' : '20px',
+                top: logoPosition?.startsWith('top') ? '20px' : 'auto',
+                right: logoPosition === 'bottom-left' ? 'auto' : '20px',
+                left: logoPosition === 'bottom-left' ? '20px' : 'auto',
+                zIndex: 35,
+                pointerEvents: 'none'
+              }}>
+                <span className="font-space" style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '11px',
+                  fontWeight: '800',
+                  color: primaryColor,
+                  background: 'rgba(5, 6, 8, 0.92)',
+                  padding: '6px 14px',
+                  borderRadius: '8px',
+                  border: `1.5px solid ${primaryColor}`,
+                  boxShadow: `0 4px 18px ${primaryColor}60`,
+                  letterSpacing: '1px'
+                }}>
+                  <Sparkles style={{ width: '12px', height: '12px', color: accentColor }} />
+                  {logoMarkText}
+                </span>
+              </div>
+            )}
+
             {/* BOTTOM: Tagline & Technical Footer */}
             <div style={{
               position: 'relative',
@@ -666,25 +784,6 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
               <span className="font-space" style={{ fontSize: '10px', color: secondaryColor, letterSpacing: '0.5px' }}>
                 {tagline}
               </span>
-
-              {logoMarkText && (
-                <span className="font-space" style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  fontSize: '10px',
-                  fontWeight: '800',
-                  color: primaryColor,
-                  background: 'rgba(0, 0, 0, 0.45)',
-                  padding: '4px 10px',
-                  borderRadius: '6px',
-                  border: `1px solid ${accentColor}40`,
-                  letterSpacing: '0.5px'
-                }}>
-                  <Sparkles style={{ width: '11px', height: '11px', color: accentColor }} />
-                  {logoMarkText}
-                </span>
-              )}
             </div>
           </div>
         </div>
@@ -926,6 +1025,136 @@ export default function CanvasStudio({ currentDesign, setCurrentDesign, onExport
                 style={{ width: '100%', accentColor: '#00DFD8' }}
               />
             </div>
+          </div>
+
+          {/* INTERACTIVE FEATURE PLUGINS PANEL */}
+          <div style={{ marginTop: '20px' }}>
+            <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
+              STUDIO FEATURE PLUGINS
+            </label>
+
+            {/* Plugin Navigation Tabs */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', marginBottom: '12px', background: 'rgba(0, 0, 0, 0.4)', padding: '4px', borderRadius: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setActivePluginTab('filters')}
+                style={{
+                  padding: '6px 4px',
+                  borderRadius: '6px',
+                  background: activePluginTab === 'filters' ? '#00DFD8' : 'transparent',
+                  color: activePluginTab === 'filters' ? '#000' : '#94A3B8',
+                  fontWeight: '700',
+                  fontSize: '10px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Sparkles style={{ width: '12px', height: '12px' }} /> FX
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActivePluginTab('stickers')}
+                style={{
+                  padding: '6px 4px',
+                  borderRadius: '6px',
+                  background: activePluginTab === 'stickers' ? '#FF0080' : 'transparent',
+                  color: activePluginTab === 'stickers' ? '#FFF' : '#94A3B8',
+                  fontWeight: '700',
+                  fontSize: '10px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Tag style={{ width: '12px', height: '12px' }} /> Stickers
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActivePluginTab('ai')}
+                style={{
+                  padding: '6px 4px',
+                  borderRadius: '6px',
+                  background: activePluginTab === 'ai' ? '#38BDF8' : 'transparent',
+                  color: activePluginTab === 'ai' ? '#000' : '#94A3B8',
+                  fontWeight: '700',
+                  fontSize: '10px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Wand2 style={{ width: '12px', height: '12px' }} /> AI
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActivePluginTab('code')}
+                style={{
+                  padding: '6px 4px',
+                  borderRadius: '6px',
+                  background: activePluginTab === 'code' ? '#10B981' : 'transparent',
+                  color: activePluginTab === 'code' ? '#000' : '#94A3B8',
+                  fontWeight: '700',
+                  fontSize: '10px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Code style={{ width: '12px', height: '12px' }} /> Code
+              </button>
+            </div>
+
+            {/* Active Plugin Content */}
+            {activePluginTab === 'filters' && (
+              <ImageFilterPlugin
+                filterState={filterState}
+                setFilterState={setFilterState}
+              />
+            )}
+
+            {activePluginTab === 'stickers' && (
+              <StickerAssetLibrary
+                activeStickers={activeStickers}
+                setActiveStickers={setActiveStickers}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
+              />
+            )}
+
+            {activePluginTab === 'ai' && (
+              <AiVisualGeneratorPlugin
+                setBgImage={setBgImage}
+                setOverlayOpacity={setOverlayOpacity}
+                setBgPattern={setBgPattern}
+              />
+            )}
+
+            {activePluginTab === 'code' && (
+              <CodeExportPlugin
+                headline={headline}
+                subtitle={subtitle}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
+                bgColor={bgColor}
+                activeFormat={activeFormat}
+              />
+            )}
           </div>
         </div>
 

@@ -10,11 +10,13 @@ import ExportModal from './components/ExportModal';
 import MonetizationPricing from './components/MonetizationPricing';
 import ServiceQuoteCalculator from './components/ServiceQuoteCalculator';
 import AiDesignAssistant from './components/AiDesignAssistant';
+import MobileAppInstallBanner from './components/MobileAppInstallBanner';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('gallery');
   const [currentDesign, setCurrentDesign] = useState(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isAppInstallOpen, setIsAppInstallOpen] = useState(false);
   const [exportType, setExportType] = useState('png');
 
   const handleSelectDesignForStudio = (item) => {
@@ -28,6 +30,9 @@ export default function App() {
   };
 
   const handleTriggerExport = (type = 'png') => {
+    if (activeTab !== 'studio') {
+      setActiveTab('studio');
+    }
     setExportType(type);
     setIsExportOpen(true);
   };
@@ -39,6 +44,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onQuickExport={() => handleTriggerExport('png')}
+        onOpenAppInstall={() => setIsAppInstallOpen(true)}
       />
 
       {/* Main Content View Switcher */}
@@ -48,6 +54,7 @@ export default function App() {
           <HeroSection
             onOpenStudio={() => setActiveTab('studio')}
             onOpenMockup={() => setActiveTab('mockups')}
+            onOpenAppInstall={() => setIsAppInstallOpen(true)}
           />
         )}
 
@@ -107,6 +114,12 @@ export default function App() {
           onClose={() => setIsExportOpen(false)}
         />
       )}
+
+      {/* Mobile PWA App Install Modal */}
+      <MobileAppInstallBanner
+        isOpen={isAppInstallOpen}
+        onClose={() => setIsAppInstallOpen(false)}
+      />
 
       {/* Footer */}
       <footer style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)', padding: '32px 24px', background: 'rgba(5, 6, 8, 0.9)' }}>
