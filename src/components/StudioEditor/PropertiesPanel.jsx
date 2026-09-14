@@ -45,6 +45,8 @@ export default function PropertiesPanel({
   headlineFont, setHeadlineFont,
   subFont, setSubFont,
   align, setAlign,
+  headlineFontSize, setHeadlineFontSize,
+  selectedElement, setSelectedElement,
   primaryColor, setPrimaryColor,
   secondaryColor, setSecondaryColor,
   bgColor, setBgColor,
@@ -54,11 +56,18 @@ export default function PropertiesPanel({
 }) {
   return (
     <div className="glass-panel" style={{ padding: '20px', overflowY: 'auto', maxHeight: '850px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-        <Sliders style={{ width: '18px', height: '18px', color: '#00DFD8' }} />
-        <h3 className="font-syne" style={{ fontSize: '18px', fontWeight: '700', color: '#FFF', margin: 0 }}>
-          Studio Controls & Properties
-        </h3>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Sliders style={{ width: '18px', height: '18px', color: '#00DFD8' }} />
+          <h3 className="font-syne" style={{ fontSize: '18px', fontWeight: '700', color: '#FFF', margin: 0 }}>
+            Studio Inspector
+          </h3>
+        </div>
+        {selectedElement && (
+          <span style={{ fontSize: '10px', background: 'rgba(0, 223, 216, 0.2)', color: '#00DFD8', padding: '2px 8px', borderRadius: '4px', border: '1px solid #00DFD8', fontWeight: '700' }}>
+            Editing: {selectedElement.toUpperCase()}
+          </span>
+        )}
       </div>
 
       {/* Design Presets */}
@@ -137,13 +146,28 @@ export default function PropertiesPanel({
           </div>
 
           <div>
-            <span style={{ fontSize: '10px', color: '#64748B' }}>Headline Title</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+              <span style={{ fontSize: '10px', color: '#64748B' }}>Headline Title</span>
+              <span style={{ fontSize: '10px', color: '#00DFD8', fontFamily: 'monospace' }}>{headlineFontSize}px</span>
+            </div>
             <input
               type="text"
               value={headline}
+              onFocus={() => setSelectedElement && setSelectedElement('headline')}
               onChange={(e) => setHeadline(e.target.value)}
-              style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', background: 'rgba(0, 0, 0, 0.4)', border: '1px solid rgba(255, 255, 255, 0.1)', color: '#FFF', fontSize: '13px', fontWeight: '700' }}
+              style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', background: 'rgba(0, 0, 0, 0.4)', border: selectedElement === 'headline' ? '1px solid #00DFD8' : '1px solid rgba(255, 255, 255, 0.1)', color: '#FFF', fontSize: '13px', fontWeight: '700', marginBottom: '6px' }}
             />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '9px', color: '#64748B' }}>Font Size</span>
+              <input
+                type="range"
+                min="18"
+                max="72"
+                value={headlineFontSize}
+                onChange={(e) => setHeadlineFontSize(Number(e.target.value))}
+                style={{ flex: 1, accentColor: '#00DFD8' }}
+              />
+            </div>
           </div>
 
           {/* Font Picker */}

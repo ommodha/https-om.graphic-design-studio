@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { MEDIA_FORMATS } from '../../data/designTemplates';
 import heroBrandingImg from '../../assets/hero_branding_art_1789199298688.png';
 
-import Toolbar from './Toolbar';
+import EditorToolbar from './EditorToolbar';
 import PropertiesPanel from './PropertiesPanel';
 import LayersPanel from './LayersPanel';
 import ImageFilterPlugin, { FILTER_PRESETS } from './Plugins/ImageFilterPlugin';
@@ -10,9 +10,7 @@ import StickerAssetLibrary, { STICKER_TEMPLATES } from './Plugins/StickerAssetLi
 import AiVisualGeneratorPlugin from './Plugins/AiVisualGeneratorPlugin';
 import CodeExportPlugin from './Plugins/CodeExportPlugin';
 
-import {
-  Sparkles, Upload, Tag, Wand2, Code
-} from 'lucide-react';
+import { Sparkles, Upload, Tag, Wand2, Code } from 'lucide-react';
 
 export default function CanvasStudio({ currentDesign, onExport }) {
   const canvasRef = useRef(null);
@@ -23,6 +21,11 @@ export default function CanvasStudio({ currentDesign, onExport }) {
   const [showBleed, setShowBleed] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
   const [cmykMode, setCmykMode] = useState(false);
+
+  // Interactive Stage & Selection State
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [selectedElement, setSelectedElement] = useState(null);
+  const [headlineFontSize, setHeadlineFontSize] = useState(36);
 
   // Layers Manager State
   const [layers, setLayers] = useState([
@@ -150,7 +153,7 @@ export default function CanvasStudio({ currentDesign, onExport }) {
     <div style={{ padding: '0 12px 48px' }}>
       
       {/* TOP TOOLBAR */}
-      <Toolbar
+      <EditorToolbar
         activeFormat={activeFormat}
         setActiveFormat={setActiveFormat}
         showBleed={showBleed}
@@ -159,6 +162,8 @@ export default function CanvasStudio({ currentDesign, onExport }) {
         setShowGrid={setShowGrid}
         cmykMode={cmykMode}
         setCmykMode={setCmykMode}
+        zoomLevel={zoomLevel}
+        setZoomLevel={setZoomLevel}
         onExport={onExport}
       />
 
@@ -175,6 +180,8 @@ export default function CanvasStudio({ currentDesign, onExport }) {
           headlineFont={headlineFont} setHeadlineFont={setHeadlineFont}
           subFont={subFont} setSubFont={setSubFont}
           align={align} setAlign={setAlign}
+          headlineFontSize={headlineFontSize} setHeadlineFontSize={setHeadlineFontSize}
+          selectedElement={selectedElement} setSelectedElement={setSelectedElement}
           primaryColor={primaryColor} setPrimaryColor={setPrimaryColor}
           secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
           bgColor={bgColor} setBgColor={setBgColor}
@@ -185,9 +192,9 @@ export default function CanvasStudio({ currentDesign, onExport }) {
         />
 
         {/* CENTER COLUMN: Interactive Canvas Stage */}
-        <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
           
-          {/* THE LIVE GRAPHIC CANVAS STAGE */}
+          {/* THE LIVE GRAPHIC CANVAS STAGE (WITH REAL ZOOM SCALE & ELEMENT SELECTION) */}
           <div
             ref={canvasRef}
             id="graphic-canvas-export"
@@ -203,7 +210,9 @@ export default function CanvasStudio({ currentDesign, onExport }) {
               boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8)',
               border: '1px solid rgba(255, 255, 255, 0.15)',
               filter: cmykMode ? 'contrast(0.95) saturate(0.85)' : 'none',
-              transition: 'all 0.3s ease',
+              transform: `scale(${zoomLevel})`,
+              transformOrigin: 'center center',
+              transition: 'transform 0.2s ease, filter 0.3s ease',
               display: 'flex',
               flexDirection: 'column',
               justify: 'space-between',
@@ -272,16 +281,20 @@ export default function CanvasStudio({ currentDesign, onExport }) {
               justify: align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'
             }}>
               {badgeText && isLayerVisible('layer-badge') && (
-                <span className="font-space" style={{
-                  padding: '6px 14px',
-                  borderRadius: '99px',
-                  background: primaryColor,
-                  color: bgColor,
-                  fontSize: '11px',
-                  fontWeight: '800',
-                  letterSpacing: '1px',
-                  boxShadow: `0 4px 15px ${primaryColor}40`
-                }}>
+                <span
+                  onClick={() => setSelectedElement('badge')}
+                  className={`font-space canvas-element-selectable ${selectedElement === 'badge' ? 'canvas-element-selected' : ''}`}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '99px',
+                    background: primaryColor,
+                    color: bgColor,
+                    fontSize: '11px',
+                    fontWeight: '800',
+                    letterSpacing: '1px',
+                    boxShadow: `0 4px 15px ${primaryColor}40`
+                  }}
+                >
                   {badgeText}
                 </span>
               )}
@@ -291,9 +304,11 @@ export default function CanvasStudio({ currentDesign, onExport }) {
             <div style={{ position: 'relative', zIndex: 10, textAlign: align, margin: '20px 0' }}>
               {headline && isLayerVisible('layer-headline') && (
                 <h2
+                  onClick={() => setSelectedElement('headline')}
+                  className={`canvas-element-selectable ${selectedElement === 'headline' ? 'canvas-element-selected' : ''}`}
                   style={{
                     fontFamily: `'${headlineFont}', sans-serif, serif`,
-                    fontSize: activeFormat.id === 'business-card' ? '24px' : '36px',
+                    fontSize: activeFormat.id === 'business-card' ? `${Math.max(16, headlineFontSize - 12)}px` : `${headlineFontSize}px`,
                     fontWeight: '800',
                     color: primaryColor,
                     lineHeight: '1.1',
@@ -308,6 +323,8 @@ export default function CanvasStudio({ currentDesign, onExport }) {
 
               {subtitle && isLayerVisible('layer-sub') && (
                 <p
+                  onClick={() => setSelectedElement('subtitle')}
+                  className={`canvas-element-selectable ${selectedElement === 'subtitle' ? 'canvas-element-selected' : ''}`}
                   style={{
                     fontFamily: `'${subFont}', sans-serif, serif`,
                     fontSize: activeFormat.id === 'business-card' ? '12px' : '15px',

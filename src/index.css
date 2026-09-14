@@ -180,6 +180,24 @@ body {
   animation: pulseGlow 4s ease-in-out infinite;
 }
 
+/* Interactive Canvas Element Selection */
+.canvas-element-selectable {
+  cursor: pointer;
+  transition: outline 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 4px;
+}
+
+.canvas-element-selectable:hover {
+  outline: 1.5px dashed var(--accent-cyan);
+  outline-offset: 4px;
+}
+
+.canvas-element-selected {
+  outline: 2px solid var(--accent-cyan) !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 16px rgba(0, 223, 216, 0.4) !important;
+}
+
 /* Mobile responsive navigation & layout styles */
 @media (max-width: 900px) {
   html, body {
