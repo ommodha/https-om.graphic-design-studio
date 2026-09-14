@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
+import Dashboard from './components/Dashboard/Dashboard';
 import HeroSection from './components/HeroSection';
 import PortfolioGallery from './components/PortfolioGallery';
 import CanvasStudio from './components/StudioEditor/CanvasStudio';
@@ -13,7 +14,7 @@ import AiDesignAssistant from './components/AiDesignAssistant';
 import MobileAppInstallBanner from './components/MobileAppInstallBanner';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('gallery');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [currentDesign, setCurrentDesign] = useState(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isAppInstallOpen, setIsAppInstallOpen] = useState(false);
@@ -27,6 +28,17 @@ export default function App() {
   const handleSelectDesignForMockup = (item) => {
     setCurrentDesign(item);
     setActiveTab('mockups');
+  };
+
+  const handleOpenStudioWithFormat = (fmt) => {
+    if (fmt) {
+      setCurrentDesign({
+        title: fmt.name,
+        subtitle: `${fmt.displaySize} • ${fmt.category.toUpperCase()}`,
+        formatId: fmt.id
+      });
+    }
+    setActiveTab('studio');
   };
 
   const handleTriggerExport = (type = 'png') => {
@@ -49,6 +61,18 @@ export default function App() {
 
       {/* Main Content View Switcher */}
       <main style={{ flex: 1 }}>
+        {/* Tab 0: Designer Dashboard Hub */}
+        {activeTab === 'dashboard' && (
+          <Dashboard
+            onOpenStudioWithFormat={handleOpenStudioWithFormat}
+            onEditProject={handleSelectDesignForStudio}
+            onExportProject={(item) => {
+              setCurrentDesign(item);
+              handleTriggerExport('png');
+            }}
+          />
+        )}
+
         {/* Showcase Hero Banner (Shown on Gallery tab) */}
         {activeTab === 'gallery' && (
           <HeroSection

@@ -1,59 +1,45 @@
 import React, { useState, useRef } from 'react';
-import { MEDIA_FORMATS, DESIGN_TEMPLATES } from '../../data/designTemplates';
-import { COLOR_PALETTES } from '../../data/brandPresets';
-import brandIdentityImg from '../../assets/brand_identity_collateral_1789199524359.png';
-import swissPosterImg from '../../assets/swiss_poster_design_1789199320446.png';
-import digitalCampaignImg from '../../assets/digital_social_campaign_1789199592437.png';
+import { MEDIA_FORMATS } from '../../data/designTemplates';
 import heroBrandingImg from '../../assets/hero_branding_art_1789199298688.png';
+
+import Toolbar from './Toolbar';
+import PropertiesPanel from './PropertiesPanel';
+import LayersPanel from './LayersPanel';
 import ImageFilterPlugin, { FILTER_PRESETS } from './Plugins/ImageFilterPlugin';
 import StickerAssetLibrary, { STICKER_TEMPLATES } from './Plugins/StickerAssetLibrary';
 import AiVisualGeneratorPlugin from './Plugins/AiVisualGeneratorPlugin';
 import CodeExportPlugin from './Plugins/CodeExportPlugin';
+
 import {
-  Type, Palette, Printer, Download, Sparkles, Sliders, FileText, Image as ImageIcon, RotateCcw, Upload,
-  Tag, Wand2, Code
+  Sparkles, Upload, Tag, Wand2, Code
 } from 'lucide-react';
-
-const FEATURED_FONTS = [
-  { name: "Syne", label: "Syne (Avant-Garde Display)" },
-  { name: "Playfair Display", label: "Playfair Display (Luxury Serif)" },
-  { name: "Space Grotesk", label: "Space Grotesk (Swiss Neo-Grotesque)" },
-  { name: "Outfit", label: "Outfit (Modern Geometric)" },
-  { name: "Bebas Neue", label: "Bebas Neue (Bold Poster)" },
-  { name: "Montserrat", label: "Montserrat (Clean Corporate)" },
-  { name: "Cinzel", label: "Cinzel (Imperial Roman Serif)" },
-  { name: "Orbitron", label: "Orbitron (Cyber Tech)" },
-  { name: "Abril Fatface", label: "Abril Fatface (High-Contrast)" },
-  { name: "Poppins", label: "Poppins (Modern Sans)" },
-  { name: "Dancing Script", label: "Dancing Script (Calligraphy)" },
-  { name: "Great Vibes", label: "Great Vibes (Elegant Script)" },
-  { name: "Righteous", label: "Righteous (Pop Retro)" },
-  { name: "Cormorant Garamond", label: "Cormorant Garamond (Fine Art Serif)" },
-  { name: "Permanent Marker", label: "Permanent Marker (Brush Poster)" },
-  { name: "Noto Sans Gujarati", label: "Noto Sans Gujarati (ગુજરાતી ફોન્ટ)" },
-  { name: "Inter", label: "Inter (UI Sans)" }
-];
-
-const loadGoogleFont = (fontName) => {
-  if (!fontName) return;
-  const linkId = `gfont-${fontName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
-  if (!document.getElementById(linkId)) {
-    const link = document.createElement('link');
-    link.id = linkId;
-    link.rel = 'stylesheet';
-    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;600;700;800;900&display=swap`;
-    document.head.appendChild(link);
-  }
-};
 
 export default function CanvasStudio({ currentDesign, onExport }) {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const fontFileInputRef = useRef(null);
+
   const [activeFormat, setActiveFormat] = useState(MEDIA_FORMATS[0]);
   const [showBleed, setShowBleed] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
   const [cmykMode, setCmykMode] = useState(false);
+
+  // Layers Manager State
+  const [layers, setLayers] = useState([
+    { id: 'layer-bg', name: 'Background Image', type: 'image', visible: true, locked: false, color: '#38BDF8' },
+    { id: 'layer-badge', name: 'Badge Tag', type: 'badge', visible: true, locked: false, color: '#00DFD8' },
+    { id: 'layer-headline', name: 'Main Headline', type: 'text', visible: true, locked: false, color: '#FF0080' },
+    { id: 'layer-sub', name: 'Subtitle & Tagline', type: 'text', visible: true, locked: false, color: '#A855F7' },
+    { id: 'layer-stickers', name: 'Vector Stickers Overlay', type: 'sticker', visible: true, locked: false, color: '#10B981' }
+  ]);
+
+  const toggleLayerVisibility = (id) => {
+    setLayers(prev => prev.map(l => l.id === id ? { ...l, visible: !l.visible } : l));
+  };
+
+  const toggleLayerLock = (id) => {
+    setLayers(prev => prev.map(l => l.id === id ? { ...l, locked: !l.locked } : l));
+  };
 
   // Feature Plugin States
   const [activePluginTab, setActivePluginTab] = useState('filters');
@@ -79,9 +65,7 @@ export default function CanvasStudio({ currentDesign, onExport }) {
       };
       reader.readAsArrayBuffer(file);
     }
-    if (e.target) {
-      e.target.value = '';
-    }
+    if (e.target) e.target.value = '';
   };
 
   const handleCustomImageUpload = (e) => {
@@ -91,16 +75,12 @@ export default function CanvasStudio({ currentDesign, onExport }) {
       reader.onload = (evt) => {
         if (evt.target?.result) {
           setBgImage(evt.target.result);
-          // Set opacity high so the uploaded photo is clearly visible
           setOverlayOpacity(0.85);
         }
       };
       reader.readAsDataURL(file);
     }
-    // Reset file input so picking the same or another file always fires onChange
-    if (e.target) {
-      e.target.value = '';
-    }
+    if (e.target) e.target.value = '';
   };
 
   // Form State
@@ -163,452 +143,50 @@ export default function CanvasStudio({ currentDesign, onExport }) {
   else if (activeFormat.id === 'tri-fold') canvasAspect = '297/210';
   else if (activeFormat.id === 'billboard') canvasAspect = '3/1';
 
+  // Helper layer visibility checks
+  const isLayerVisible = (id) => layers.find(l => l.id === id)?.visible !== false;
+
   return (
     <div style={{ padding: '0 12px 48px' }}>
+      
+      {/* TOP TOOLBAR */}
+      <Toolbar
+        activeFormat={activeFormat}
+        setActiveFormat={setActiveFormat}
+        showBleed={showBleed}
+        setShowBleed={setShowBleed}
+        showGrid={showGrid}
+        setShowGrid={setShowGrid}
+        cmykMode={cmykMode}
+        setCmykMode={setCmykMode}
+        onExport={onExport}
+      />
+
       <div className="grid-mobile-stack" style={{ display: 'grid', gridTemplateColumns: '360px 1fr 340px', gap: '24px' }}>
         
-        {/* LEFT COLUMN: Controls & Presets */}
-        <div className="glass-panel" style={{ padding: '24px', overflowY: 'auto', maxHeight: '800px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <Sliders style={{ width: '18px', height: '18px', color: '#00DFD8' }} />
-            <h3 className="font-syne" style={{ fontSize: '18px', fontWeight: '700', color: '#FFF' }}>
-              Studio Controls
-            </h3>
-          </div>
+        {/* LEFT COLUMN: Properties Inspector */}
+        <PropertiesPanel
+          headline={headline} setHeadline={setHeadline}
+          subtitle={subtitle} setSubtitle={setSubtitle}
+          tagline={tagline} setTagline={setTagline}
+          badgeText={badgeText} setBadgeText={setBadgeText}
+          logoMarkText={logoMarkText} setLogoMarkText={setLogoMarkText}
+          logoPosition={logoPosition} setLogoPosition={setLogoPosition}
+          headlineFont={headlineFont} setHeadlineFont={setHeadlineFont}
+          subFont={subFont} setSubFont={setSubFont}
+          align={align} setAlign={setAlign}
+          primaryColor={primaryColor} setPrimaryColor={setPrimaryColor}
+          secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
+          bgColor={bgColor} setBgColor={setBgColor}
+          accentColor={accentColor} setAccentColor={setAccentColor}
+          applyTemplate={applyTemplate} applyPalette={applyPalette}
+          fontFileInputRef={fontFileInputRef}
+          handleCustomFontFileUpload={handleCustomFontFileUpload}
+        />
 
-          {/* Quick Preset Templates */}
-          <div style={{ marginBottom: '24px' }}>
-            <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
-              DESIGN PRESETS
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              {DESIGN_TEMPLATES.map((tpl) => (
-                <button
-                  key={tpl.id}
-                  onClick={() => applyTemplate(tpl)}
-                  style={{
-                    padding: '8px 10px',
-                    borderRadius: '8px',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: '#F1F5F9',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.borderColor = '#00DFD8'}
-                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
-                >
-                  <div style={{ color: tpl.primaryColor, fontWeight: '700' }}>{tpl.title.substring(0, 15)}...</div>
-                  <div style={{ fontSize: '9px', color: '#64748B' }}>{tpl.badge}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Format Selector */}
-          <div style={{ marginBottom: '24px' }}>
-            <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
-              MEDIA FORMAT & DIMENSIONS
-            </label>
-            <select
-              value={activeFormat.id}
-              onChange={(e) => {
-                const fmt = MEDIA_FORMATS.find(m => m.id === e.target.value);
-                if (fmt) setActiveFormat(fmt);
-              }}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '8px',
-                background: 'rgba(0, 0, 0, 0.6)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#FFF',
-                fontSize: '13px',
-                fontWeight: '600',
-                outline: 'none'
-              }}
-            >
-              <optgroup label="Digital Media (sRGB)">
-                {MEDIA_FORMATS.filter(f => f.category === 'digital').map(f => (
-                  <option key={f.id} value={f.id}>{f.name} ({f.displaySize})</option>
-                ))}
-              </optgroup>
-              <optgroup label="Print Collateral (300 DPI CMYK)">
-                {MEDIA_FORMATS.filter(f => f.category === 'print').map(f => (
-                  <option key={f.id} value={f.id}>{f.name} ({f.displaySize})</option>
-                ))}
-              </optgroup>
-            </select>
-          </div>
-
-          {/* Text Content Inputs & Typography Controls */}
-          <div style={{ marginBottom: '24px' }}>
-            <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
-              TYPOGRAPHY & CONTENT
-            </label>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div>
-                <span style={{ fontSize: '10px', color: '#64748B' }}>Badge Tag</span>
-                <input
-                  type="text"
-                  value={badgeText}
-                  onChange={(e) => setBadgeText(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: '#FFF',
-                    fontSize: '12px'
-                  }}
-                />
-              </div>
-
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-                  <span style={{ fontSize: '10px', color: '#64748B' }}>Fixed Corner Brand Logo Text</span>
-                  <span style={{ fontSize: '9px', color: '#00DFD8', fontWeight: '700' }}>FIXED CORNER</span>
-                </div>
-                <input
-                  type="text"
-                  value={logoMarkText}
-                  onChange={(e) => setLogoMarkText(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid rgba(0, 223, 216, 0.3)',
-                    color: '#00DFD8',
-                    fontSize: '12px',
-                    fontWeight: '700'
-                  }}
-                />
-              </div>
-
-              <div>
-                <span style={{ fontSize: '10px', color: '#64748B' }}>Brand Logo Position</span>
-                <select
-                  value={logoPosition}
-                  onChange={(e) => setLogoPosition(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: '#FFF',
-                    fontSize: '12px'
-                  }}
-                >
-                  <option value="bottom-right">Bottom Right Corner (Fixed)</option>
-                  <option value="bottom-left">Bottom Left Corner (Fixed)</option>
-                  <option value="top-right">Top Right Corner (Fixed)</option>
-                </select>
-              </div>
-
-              <div>
-                <span style={{ fontSize: '10px', color: '#64748B' }}>Headline Title</span>
-                <input
-                  type="text"
-                  value={headline}
-                  onChange={(e) => setHeadline(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: '#FFF',
-                    fontSize: '13px',
-                    fontWeight: '700'
-                  }}
-                />
-              </div>
-
-              {/* FONT SELECTOR DIRECTLY UNDER TYPOGRAPHY & CONTENT */}
-              <div style={{ background: 'rgba(0, 223, 216, 0.08)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(0, 223, 216, 0.25)' }}>
-                <span style={{ fontSize: '11px', color: '#00DFD8', fontWeight: '700', display: 'block', marginBottom: '6px' }}>
-                  🔤 Headline Font Style & Custom Fonts
-                </span>
-                <select
-                  value={headlineFont}
-                  onChange={(e) => {
-                    setHeadlineFont(e.target.value);
-                    loadGoogleFont(e.target.value);
-                  }}
-                  style={{ width: '100%', padding: '8px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px', marginBottom: '6px' }}
-                >
-                  {FEATURED_FONTS.map(f => (
-                    <option key={f.name} value={f.name}>{f.label}</option>
-                  ))}
-                </select>
-
-                <input
-                  type="text"
-                  placeholder="Or type any custom Google Font name..."
-                  value={headlineFont}
-                  onChange={(e) => {
-                    setHeadlineFont(e.target.value);
-                    loadGoogleFont(e.target.value);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '6px 8px',
-                    borderRadius: '4px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    color: '#00DFD8',
-                    fontSize: '11px',
-                    marginBottom: '6px'
-                  }}
-                />
-
-                <input
-                  type="file"
-                  ref={fontFileInputRef}
-                  accept=".ttf,.otf,.woff,.woff2"
-                  onChange={handleCustomFontFileUpload}
-                  style={{ display: 'none' }}
-                />
-
-                <button
-                  type="button"
-                  onClick={() => fontFileInputRef.current?.click()}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(0, 223, 216, 0.15)',
-                    border: '1px dashed rgba(0, 223, 216, 0.5)',
-                    color: '#00DFD8',
-                    fontSize: '11px',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <Type style={{ width: '13px', height: '13px' }} /> Upload Custom Font File (.TTF / .OTF)
-                </button>
-              </div>
-
-              <div>
-                <span style={{ fontSize: '10px', color: '#64748B' }}>Subtitle</span>
-                <input
-                  type="text"
-                  value={subtitle}
-                  onChange={(e) => setSubtitle(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: '#FFF',
-                    fontSize: '12px'
-                  }}
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#64748B' }}>Subtitle Font</span>
-                  <select
-                    value={subFont}
-                    onChange={(e) => {
-                      setSubFont(e.target.value);
-                      loadGoogleFont(e.target.value);
-                    }}
-                    style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
-                  >
-                    {FEATURED_FONTS.map(f => (
-                      <option key={f.name} value={f.name}>{f.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <span style={{ fontSize: '10px', color: '#64748B' }}>Alignment</span>
-                  <select
-                    value={align}
-                    onChange={(e) => setAlign(e.target.value)}
-                    style={{ width: '100%', padding: '6px', borderRadius: '6px', background: '#111', color: '#FFF', fontSize: '12px' }}
-                  >
-                    <option value="left">Left</option>
-                    <option value="center">Center</option>
-                    <option value="right">Right</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <span style={{ fontSize: '10px', color: '#64748B' }}>Tagline / Footer</span>
-                <input
-                  type="text"
-                  value={tagline}
-                  onChange={(e) => setTagline(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: '#FFF',
-                    fontSize: '11px'
-                  }}
-                />
-              </div>
-
-              <div>
-                <span style={{ fontSize: '10px', color: '#00DFD8' }}>Corner Brand Logo Text</span>
-                <input
-                  type="text"
-                  value={logoMarkText}
-                  onChange={(e) => setLogoMarkText(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid rgba(0, 223, 216, 0.3)',
-                    color: '#FFF',
-                    fontSize: '11px',
-                    fontWeight: '700'
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Crisp High-Contrast Color Scheme Picker */}
-          <div style={{ marginBottom: '24px' }}>
-            <label className="font-space" style={{ fontSize: '13px', color: '#00DFD8', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-              <Palette style={{ width: '15px', height: '15px', color: '#00DFD8' }} /> COLOR SWATCHES & PALETTES
-            </label>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '14px' }}>
-              <div style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <span style={{ fontSize: '11px', color: '#FFF', fontWeight: '700', display: 'block' }}>Primary</span>
-                  <span style={{ fontSize: '10px', color: '#00DFD8', fontFamily: 'monospace', fontWeight: '700' }}>{primaryColor.toUpperCase()}</span>
-                </div>
-                <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} style={{ width: '32px', height: '32px', border: '2px solid rgba(255,255,255,0.4)', borderRadius: '6px', cursor: 'pointer', background: 'none' }} />
-              </div>
-
-              <div style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <span style={{ fontSize: '11px', color: '#FFF', fontWeight: '700', display: 'block' }}>Secondary</span>
-                  <span style={{ fontSize: '10px', color: '#FF0080', fontFamily: 'monospace', fontWeight: '700' }}>{secondaryColor.toUpperCase()}</span>
-                </div>
-                <input type="color" value={secondaryColor} onChange={(e) => setSecondaryColor(e.target.value)} style={{ width: '32px', height: '32px', border: '2px solid rgba(255,255,255,0.4)', borderRadius: '6px', cursor: 'pointer', background: 'none' }} />
-              </div>
-
-              <div style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <span style={{ fontSize: '11px', color: '#FFF', fontWeight: '700', display: 'block' }}>Background</span>
-                  <span style={{ fontSize: '10px', color: '#CBD5E1', fontFamily: 'monospace', fontWeight: '700' }}>{bgColor.toUpperCase()}</span>
-                </div>
-                <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} style={{ width: '32px', height: '32px', border: '2px solid rgba(255,255,255,0.4)', borderRadius: '6px', cursor: 'pointer', background: 'none' }} />
-              </div>
-
-              <div style={{ background: 'rgba(0, 0, 0, 0.6)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <span style={{ fontSize: '11px', color: '#FFF', fontWeight: '700', display: 'block' }}>Accent</span>
-                  <span style={{ fontSize: '10px', color: '#D4AF37', fontFamily: 'monospace', fontWeight: '700' }}>{accentColor.toUpperCase()}</span>
-                </div>
-                <input type="color" value={accentColor} onChange={(e) => setAccentColor(e.target.value)} style={{ width: '32px', height: '32px', border: '2px solid rgba(255,255,255,0.4)', borderRadius: '6px', cursor: 'pointer', background: 'none' }} />
-              </div>
-            </div>
-
-            {/* Clear Brand Color Palette Cards */}
-            <div style={{ fontSize: '10px', color: '#94A3B8', marginBottom: '8px', fontWeight: '700', letterSpacing: '0.5px' }}>
-              PRO COLOR PALETTE PRESETS:
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              {COLOR_PALETTES.map((pal, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => applyPalette(pal)}
-                  style={{
-                    padding: '8px',
-                    borderRadius: '8px',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px',
-                    textAlign: 'left'
-                  }}
-                >
-                  <span style={{ fontSize: '10px', color: '#FFF', fontWeight: '700', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {pal.name}
-                  </span>
-                  <div style={{ display: 'flex', gap: '3px' }}>
-                    <span style={{ flex: 1, height: '14px', borderRadius: '3px', background: pal.primary, border: '1px solid rgba(255,255,255,0.2)' }} />
-                    <span style={{ flex: 1, height: '14px', borderRadius: '3px', background: pal.secondary, border: '1px solid rgba(255,255,255,0.2)' }} />
-                    <span style={{ flex: 1, height: '14px', borderRadius: '3px', background: pal.background, border: '1px solid rgba(255,255,255,0.2)' }} />
-                    <span style={{ flex: 1, height: '14px', borderRadius: '3px', background: pal.accent, border: '1px solid rgba(255,255,255,0.2)' }} />
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* CENTER COLUMN: Interactive Canvas Workstage */}
+        {/* CENTER COLUMN: Interactive Canvas Stage */}
         <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
           
-          {/* Top Canvas Bar Controls */}
-          <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span className="font-space" style={{ fontSize: '13px', fontWeight: '700', color: '#FFF' }}>
-                {activeFormat.name}
-              </span>
-              <span style={{
-                fontSize: '10px',
-                padding: '2px 8px',
-                borderRadius: '4px',
-                background: isPrint ? 'rgba(230, 57, 70, 0.2)' : 'rgba(0, 223, 216, 0.2)',
-                color: isPrint ? '#E63946' : '#00DFD8',
-                fontWeight: '700'
-              }}>
-                {isPrint ? 'OFFSET PRINT (300 DPI)' : 'DIGITAL SCREEN'}
-              </span>
-            </div>
-
-            {/* Print Guides Toggles */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {isPrint && (
-                <>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#CBD5E1', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={showBleed} onChange={(e) => setShowBleed(e.target.checked)} />
-                    Bleed Guide (3mm)
-                  </label>
-
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#CBD5E1', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={cmykMode} onChange={(e) => setCmykMode(e.target.checked)} />
-                    CMYK Simulator
-                  </label>
-                </>
-              )}
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#CBD5E1', cursor: 'pointer' }}>
-                <input type="checkbox" checked={showGrid} onChange={(e) => setShowGrid(e.target.checked)} />
-                Swiss Grid
-              </label>
-            </div>
-          </div>
-
           {/* THE LIVE GRAPHIC CANVAS STAGE */}
           <div
             ref={canvasRef}
@@ -628,12 +206,12 @@ export default function CanvasStudio({ currentDesign, onExport }) {
               transition: 'all 0.3s ease',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between',
+              justify: 'space-between',
               padding: '36px'
             }}
           >
             {/* Background Image Layer */}
-            {bgImage && (
+            {bgImage && isLayerVisible('layer-bg') && (
               <div style={{
                 position: 'absolute',
                 inset: '-24px',
@@ -648,7 +226,7 @@ export default function CanvasStudio({ currentDesign, onExport }) {
             )}
 
             {/* Vector Stickers Overlay Layer */}
-            {activeStickers.map((stk) => {
+            {isLayerVisible('layer-stickers') && activeStickers.map((stk) => {
               const tmpl = STICKER_TEMPLATES.find(t => t.id === stk.templateId) || STICKER_TEMPLATES[0];
               const IconComponent = tmpl.icon;
               return (
@@ -691,9 +269,9 @@ export default function CanvasStudio({ currentDesign, onExport }) {
               zIndex: 10,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'
+              justify: align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'
             }}>
-              {badgeText && (
+              {badgeText && isLayerVisible('layer-badge') && (
                 <span className="font-space" style={{
                   padding: '6px 14px',
                   borderRadius: '99px',
@@ -711,33 +289,37 @@ export default function CanvasStudio({ currentDesign, onExport }) {
 
             {/* CENTER: Main Headline & Subtitle */}
             <div style={{ position: 'relative', zIndex: 10, textAlign: align, margin: '20px 0' }}>
-              <h2
-                style={{
-                  fontFamily: `'${headlineFont}', sans-serif, serif`,
-                  fontSize: activeFormat.id === 'business-card' ? '24px' : '36px',
-                  fontWeight: '800',
-                  color: primaryColor,
-                  lineHeight: '1.1',
-                  letterSpacing: '-0.5px',
-                  marginBottom: '12px',
-                  textShadow: '0 2px 20px rgba(0, 0, 0, 0.5)'
-                }}
-              >
-                {headline}
-              </h2>
+              {headline && isLayerVisible('layer-headline') && (
+                <h2
+                  style={{
+                    fontFamily: `'${headlineFont}', sans-serif, serif`,
+                    fontSize: activeFormat.id === 'business-card' ? '24px' : '36px',
+                    fontWeight: '800',
+                    color: primaryColor,
+                    lineHeight: '1.1',
+                    letterSpacing: '-0.5px',
+                    marginBottom: '12px',
+                    textShadow: '0 2px 20px rgba(0, 0, 0, 0.5)'
+                  }}
+                >
+                  {headline}
+                </h2>
+              )}
 
-              <p
-                style={{
-                  fontFamily: `'${subFont}', sans-serif, serif`,
-                  fontSize: activeFormat.id === 'business-card' ? '12px' : '15px',
-                  fontWeight: '500',
-                  color: secondaryColor,
-                  letterSpacing: '0.5px',
-                  lineHeight: '1.4'
-                }}
-              >
-                {subtitle}
-              </p>
+              {subtitle && isLayerVisible('layer-sub') && (
+                <p
+                  style={{
+                    fontFamily: `'${subFont}', sans-serif, serif`,
+                    fontSize: activeFormat.id === 'business-card' ? '12px' : '15px',
+                    fontWeight: '500',
+                    color: secondaryColor,
+                    letterSpacing: '0.5px',
+                    lineHeight: '1.4'
+                  }}
+                >
+                  {subtitle}
+                </p>
+              )}
             </div>
 
             {/* FIXED CORNER BRAND LOGO STAMP */}
@@ -781,124 +363,31 @@ export default function CanvasStudio({ currentDesign, onExport }) {
               alignItems: 'center',
               justifyContent: 'space-between'
             }}>
-              <span className="font-space" style={{ fontSize: '10px', color: secondaryColor, letterSpacing: '0.5px' }}>
-                {tagline}
-              </span>
+              {tagline && isLayerVisible('layer-sub') && (
+                <span className="font-space" style={{ fontSize: '10px', color: secondaryColor, letterSpacing: '0.5px' }}>
+                  {tagline}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Export & Print Specifications */}
-        <div className="glass-panel" style={{ padding: '24px', overflowY: 'auto', maxHeight: '800px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <Printer style={{ width: '18px', height: '18px', color: '#FF0080' }} />
-            <h3 className="font-syne" style={{ fontSize: '18px', fontWeight: '700', color: '#FFF' }}>
-              Export & Specs
-            </h3>
-          </div>
+        {/* RIGHT COLUMN: Layers Manager & Plugin Suite */}
+        <div className="glass-panel" style={{ padding: '24px', overflowY: 'auto', maxHeight: '850px' }}>
+          
+          {/* LAYERS MANAGER */}
+          <LayersPanel
+            layers={layers}
+            toggleLayerVisibility={toggleLayerVisibility}
+            toggleLayerLock={toggleLayerLock}
+          />
 
-          {/* Quick Export Actions */}
+          {/* Photo & Background Uploader */}
           <div style={{ marginBottom: '24px' }}>
-            <button
-              onClick={() => onExport('png')}
-              className="font-space"
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, #00DFD8 0%, #0066FF 100%)',
-                color: '#000',
-                fontWeight: '800',
-                fontSize: '13px',
-                border: 'none',
-                cursor: 'pointer',
-                marginBottom: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
-            >
-              <Download style={{ width: '16px', height: '16px' }} /> Export Ultra High-Res PNG
-            </button>
-
-            <button
-              onClick={() => onExport('pdf')}
-              className="font-space"
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '10px',
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#FFF',
-                fontWeight: '700',
-                fontSize: '13px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
-            >
-              <FileText style={{ width: '16px', height: '16px' }} /> Download Print Spec Sheet
-            </button>
-          </div>
-
-          {/* Technical Spec Inspector Summary */}
-          <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '16px', borderRadius: '12px', marginBottom: '20px' }}>
-            <h4 className="font-space" style={{ fontSize: '12px', fontWeight: '700', color: '#00DFD8', marginBottom: '12px', textTransform: 'uppercase' }}>
-              ACTIVE SPECIFICATIONS
-            </h4>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1' }}>
-                <span>Target Output:</span>
-                <strong style={{ color: '#FFF' }}>{activeFormat.category.toUpperCase()}</strong>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1' }}>
-                <span>Dimensions:</span>
-                <strong style={{ color: '#FFF' }}>{activeFormat.displaySize}</strong>
-              </div>
-
-              {isPrint ? (
-                <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1' }}>
-                    <span>Resolution:</span>
-                    <strong style={{ color: '#FF0080' }}>300 DPI Vector Ready</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1' }}>
-                    <span>Bleed Allowance:</span>
-                    <strong style={{ color: '#E63946' }}>3mm Outer Boundary</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1' }}>
-                    <span>Color Profile:</span>
-                    <strong style={{ color: '#D4AF37' }}>CMYK Fogra39 / SWOP</strong>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1' }}>
-                    <span>Pixel Grid:</span>
-                    <strong style={{ color: '#00DFD8' }}>{activeFormat.widthPx} x {activeFormat.heightPx} px</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#CBD5E1' }}>
-                    <span>Color Profile:</span>
-                    <strong style={{ color: '#38BDF8' }}>sRGB Display P3 Wide</strong>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Background Image Selection */}
-          <div>
             <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
-              ARTWORK OVERLAY & CUSTOM PHOTO
+              CUSTOM PHOTO / OVERLAY
             </label>
 
-            {/* Custom Photo File Uploader Input */}
             <input
               type="file"
               ref={fileInputRef}
@@ -907,128 +396,33 @@ export default function CanvasStudio({ currentDesign, onExport }) {
               onChange={handleCustomImageUpload}
             />
 
-            {bgImage?.startsWith('data:image') ? (
-              <div style={{ background: 'rgba(0, 223, 216, 0.12)', border: '1px solid #00DFD8', padding: '12px', borderRadius: '10px', marginBottom: '12px' }}>
-                <div style={{ fontSize: '11px', color: '#00DFD8', fontWeight: '700', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <ImageIcon style={{ width: '14px', height: '14px' }} /> Custom Photo Active on Canvas
-                </div>
-
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    style={{
-                      flex: 1,
-                      padding: '8px',
-                      borderRadius: '6px',
-                      background: 'linear-gradient(135deg, #00DFD8 0%, #0066FF 100%)',
-                      color: '#000',
-                      fontWeight: '700',
-                      fontSize: '11px',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <RotateCcw style={{ width: '12px', height: '12px' }} /> Change / Replace Photo
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setBgImage(heroBrandingImg)}
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: '6px',
-                      background: 'rgba(230, 57, 70, 0.2)',
-                      border: '1px solid rgba(230, 57, 70, 0.4)',
-                      color: '#E63946',
-                      fontWeight: '700',
-                      fontSize: '11px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Remove Photo
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="font-space"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #FF0080 0%, #7928CA 100%)',
-                  color: '#FFF',
-                  fontWeight: '800',
-                  fontSize: '12px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  marginBottom: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 15px rgba(255, 0, 128, 0.3)'
-                }}
-              >
-                <Upload style={{ width: '16px', height: '16px' }} /> Upload Your Own Photo / Picture
-              </button>
-            )}
-
-            <div style={{ fontSize: '10px', color: '#64748B', marginBottom: '6px' }}>
-              OR CHOOSE SAMPLE ARTWORK:
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-              {[
-                { name: 'Futuristic 3D', url: heroBrandingImg },
-                { name: 'Swiss Typo', url: swissPosterImg },
-                { name: 'Brand Foil', url: brandIdentityImg },
-                { name: 'Cyber Neon', url: digitalCampaignImg }
-              ].map((img, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setBgImage(img.url)}
-                  style={{
-                    padding: '6px',
-                    borderRadius: '6px',
-                    background: bgImage === img.url ? 'rgba(0, 223, 216, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                    border: bgImage === img.url ? '1px solid #00DFD8' : '1px solid transparent',
-                    color: '#FFF',
-                    fontSize: '10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {img.name}
-                </button>
-              ))}
-            </div>
-
-            <div style={{ marginBottom: '12px' }}>
-              <span style={{ fontSize: '10px', color: '#64748B', display: 'block', marginBottom: '4px' }}>
-                Overlay Opacity: {Math.round(overlayOpacity * 100)}%
-              </span>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={overlayOpacity}
-                onChange={(e) => setOverlayOpacity(parseFloat(e.target.value))}
-                style={{ width: '100%', accentColor: '#00DFD8' }}
-              />
-            </div>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="font-space"
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #FF0080 0%, #7928CA 100%)',
+                color: '#FFF',
+                fontWeight: '800',
+                fontSize: '11px',
+                border: 'none',
+                cursor: 'pointer',
+                marginBottom: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}
+            >
+              <Upload style={{ width: '14px', height: '14px' }} /> Upload Your Own Photo
+            </button>
           </div>
 
           {/* INTERACTIVE FEATURE PLUGINS PANEL */}
-          <div style={{ marginTop: '20px' }}>
+          <div>
             <label className="font-space" style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '8px' }}>
               STUDIO FEATURE PLUGINS
             </label>
@@ -1133,7 +527,6 @@ export default function CanvasStudio({ currentDesign, onExport }) {
                 activeStickers={activeStickers}
                 setActiveStickers={setActiveStickers}
                 primaryColor={primaryColor}
-                secondaryColor={secondaryColor}
               />
             )}
 

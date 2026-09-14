@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Palette, Edit3, Image, Layers, Printer, Sparkles, Download, Menu, X, Smartphone } from 'lucide-react';
+import { Palette, Edit3, Image, Layers, Printer, Sparkles, Download, Menu, X, Smartphone, LayoutGrid } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, onQuickExport, onOpenAppInstall }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, badge: 'Home' },
     { id: 'gallery', label: 'Portfolio Showcase', icon: Image, badge: 'Digital & Print' },
     { id: 'studio', label: 'Graphic Studio Editor', icon: Edit3, badge: 'Photo & Design' },
     { id: 'mockups', label: '3D Mockup Stage', icon: Layers, badge: 'Realistic' },
