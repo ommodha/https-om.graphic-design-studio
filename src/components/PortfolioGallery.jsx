@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { PORTFOLIO_ITEMS } from '../data/portfolioItems';
-import { Filter, Eye, Edit3, Printer, Monitor, Palette, Sparkles, Check, ArrowUpRight, X, Download } from 'lucide-react';
+import { Filter, Eye, Edit3, Printer, Monitor, Palette, Sparkles, Check, ArrowUpRight, X, Download, ArrowLeft } from 'lucide-react';
 
-export default function PortfolioGallery({ onSelectDesignForEditor, onSelectForMockup }) {
+export default function PortfolioGallery({ onBack, onSelectDesignForEditor, onSelectForMockup }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -270,26 +270,45 @@ export default function PortfolioGallery({ onSelectDesignForEditor, onSelectForM
             padding: '32px',
             position: 'relative'
           }}>
-            <button
-              onClick={() => setSelectedItem(null)}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: 'none',
-                color: '#FFF',
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <X style={{ width: '20px', height: '20px' }} />
-            </button>
+            {/* Modal Header Bar with Back Button */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <button
+                onClick={() => setSelectedItem(null)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  background: 'rgba(0, 223, 216, 0.15)',
+                  border: '1px solid rgba(0, 223, 216, 0.4)',
+                  color: '#00DFD8',
+                  fontWeight: '700',
+                  fontSize: '13px',
+                  cursor: 'pointer'
+                }}
+              >
+                <ArrowLeft style={{ width: '16px', height: '16px' }} /> ← Back to Gallery (પાછા જાઓ)
+              </button>
+
+              <button
+                onClick={() => setSelectedItem(null)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  color: '#FFF',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X style={{ width: '20px', height: '20px' }} />
+              </button>
+            </div>
 
             <div className="grid-mobile-stack" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px' }}>
               <div>

@@ -1,9 +1,9 @@
 import React from 'react';
 import QuickCreate from './QuickCreate';
 import RecentProjects from './RecentProjects';
-import { Sparkles, Layers, Printer, ShieldCheck, Download, Plus, ArrowRight } from 'lucide-react';
+import { Sparkles, Layers, Printer, ShieldCheck, Download, Plus, ArrowRight, Layout } from 'lucide-react';
 
-export default function Dashboard({ onOpenStudioWithFormat, onEditProject, onExportProject }) {
+export default function Dashboard({ onOpenStudioWithFormat, onOpenTemplates, onEditProject, onExportProject }) {
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px 48px' }}>
       
@@ -46,30 +46,61 @@ export default function Dashboard({ onOpenStudioWithFormat, onEditProject, onExp
           </p>
         </div>
 
-        {/* Quick Launch Action Button */}
-        <button
-          onClick={() => onOpenStudioWithFormat(null)}
-          className="font-space"
-          style={{
-            padding: '14px 28px',
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, #00DFD8 0%, #7928CA 100%)',
-            color: '#FFF',
-            fontWeight: '800',
-            fontSize: '14px',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            boxShadow: '0 8px 25px rgba(0, 223, 216, 0.3)',
-            transition: 'transform 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-        >
-          <Plus style={{ width: '18px', height: '18px' }} /> Launch Blank Canvas
-        </button>
+        {/* Quick Launch Action Buttons */}
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <button
+            onClick={onOpenTemplates}
+            className="font-space"
+            style={{
+              padding: '14px 24px',
+              borderRadius: '12px',
+              background: 'rgba(0, 223, 216, 0.15)',
+              color: '#00DFD8',
+              fontWeight: '800',
+              fontSize: '14px',
+              border: '1px solid rgba(0, 223, 216, 0.4)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(0, 223, 216, 0.25)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(0, 223, 216, 0.15)';
+              e.currentTarget.style.transform = 'none';
+            }}
+          >
+            <Layout style={{ width: '18px', height: '18px' }} /> Browse Templates
+          </button>
+
+          <button
+            onClick={() => onOpenStudioWithFormat(null)}
+            className="font-space"
+            style={{
+              padding: '14px 28px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #00DFD8 0%, #7928CA 100%)',
+              color: '#FFF',
+              fontWeight: '800',
+              fontSize: '14px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              boxShadow: '0 8px 25px rgba(0, 223, 216, 0.3)',
+              transition: 'transform 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
+          >
+            <Plus style={{ width: '18px', height: '18px' }} /> Launch Blank Canvas
+          </button>
+        </div>
       </div>
 
       {/* Stats Counter Bar */}

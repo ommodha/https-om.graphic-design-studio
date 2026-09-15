@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MEDIA_FORMATS } from '../../data/designTemplates';
-import { Download, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { Download, ZoomIn, ZoomOut, Maximize2, Bookmark, Check, ArrowLeft } from 'lucide-react';
 
 export default function EditorToolbar({
+  onBack,
   activeFormat,
   setActiveFormat,
   showBleed,
@@ -13,9 +14,19 @@ export default function EditorToolbar({
   setCmykMode,
   zoomLevel,
   setZoomLevel,
-  onExport
+  onExport,
+  onSaveAsMyTemplate
 }) {
+  const [savedSuccess, setSavedSuccess] = useState(false);
   const isPrint = activeFormat.category === 'print';
+
+  const handleSaveClick = () => {
+    if (onSaveAsMyTemplate) {
+      onSaveAsMyTemplate();
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 2500);
+    }
+  };
 
   return (
     <div className="glass-panel font-space" style={{
@@ -31,8 +42,30 @@ export default function EditorToolbar({
       background: 'rgba(15, 23, 42, 0.7)',
       border: '1px solid rgba(255, 255, 255, 0.12)'
     }}>
-      {/* Left Group: Active Format & Category Badge */}
+      {/* Left Group: Back Button & Active Format Badge */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {onBack && (
+          <button
+            onClick={onBack}
+            title="Back to Templates / Dashboard (પાછા જાઓ)"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              background: 'rgba(0, 223, 216, 0.15)',
+              border: '1px solid rgba(0, 223, 216, 0.4)',
+              color: '#00DFD8',
+              fontWeight: '700',
+              fontSize: '12px',
+              cursor: 'pointer'
+            }}
+          >
+            <ArrowLeft style={{ width: '14px', height: '14px' }} /> ← Back
+          </button>
+        )}
+
         <select
           value={activeFormat.id}
           onChange={(e) => {
@@ -148,8 +181,30 @@ export default function EditorToolbar({
         </label>
       </div>
 
-      {/* Right Group: Quick Export Action */}
+      {/* Right Group: Save to My Templates & Quick Export Actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button
+          onClick={handleSaveClick}
+          title="Save as My Template (મારા ટેમ્પલેટ્સમાં સેવ કરો)"
+          style={{
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: savedSuccess ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 0, 128, 0.15)',
+            border: savedSuccess ? '1px solid #10B981' : '1px solid rgba(255, 0, 128, 0.4)',
+            color: savedSuccess ? '#10B981' : '#FF0080',
+            fontWeight: '700',
+            fontSize: '12px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          {savedSuccess ? <Check style={{ width: '14px', height: '14px' }} /> : <Bookmark style={{ width: '14px', height: '14px' }} />}
+          {savedSuccess ? 'Saved to My Templates!' : 'Save to My Templates'}
+        </button>
+
         <button
           onClick={() => onExport('png')}
           style={{
@@ -173,3 +228,4 @@ export default function EditorToolbar({
     </div>
   );
 }
+

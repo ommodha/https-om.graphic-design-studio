@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { MEDIA_FORMATS } from '../../data/designTemplates';
+import { saveMyTemplate } from '../../utils/myTemplatesStorage';
 import heroBrandingImg from '../../assets/hero_branding_art_1789199298688.png';
 
 import EditorToolbar from './EditorToolbar';
@@ -12,7 +13,7 @@ import CodeExportPlugin from './Plugins/CodeExportPlugin';
 
 import { Sparkles, Upload, Tag, Wand2, Code } from 'lucide-react';
 
-export default function CanvasStudio({ currentDesign, onExport }) {
+export default function CanvasStudio({ onBack, currentDesign, onExport }) {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const fontFileInputRef = useRef(null);
@@ -98,34 +99,55 @@ export default function CanvasStudio({ currentDesign, onExport }) {
   const [subFont, setSubFont] = useState(currentDesign?.subFont || "Space Grotesk");
   const [align, setAlign] = useState(currentDesign?.align || "left");
 
+  // Colors & Background
   const [primaryColor, setPrimaryColor] = useState(currentDesign?.primaryColor || "#00DFD8");
   const [secondaryColor, setSecondaryColor] = useState(currentDesign?.secondaryColor || "#FF0080");
   const [bgColor, setBgColor] = useState(currentDesign?.bgColor || "#0A0A0C");
-  const [accentColor, setAccentColor] = useState(currentDesign?.accentColor || "#D4AF37");
-
-  const [bgImage, setBgImage] = useState(currentDesign?.backgroundImage || heroBrandingImg);
-  const [overlayOpacity, setOverlayOpacity] = useState(currentDesign?.overlayOpacity || 0.25);
+  const [accentColor, setAccentColor] = useState(currentDesign?.accentColor || "#7928CA");
   const [bgPattern, setBgPattern] = useState(currentDesign?.bgPattern || "cyber-mesh");
+  const [bgImage, setBgImage] = useState(currentDesign?.backgroundImage || heroBrandingImg);
+  const [overlayOpacity, setOverlayOpacity] = useState(currentDesign?.overlayOpacity !== undefined ? currentDesign.overlayOpacity : 0.35);
 
   // Handle Preset Loading
   const applyTemplate = (tpl) => {
     setHeadline(tpl.title);
     setSubtitle(tpl.subtitle);
-    setTagline(tpl.tagline);
-    setBadgeText(tpl.badge);
-    setHeadlineFont(tpl.headlineFont);
-    setSubFont(tpl.subFont);
-    setAlign(tpl.align);
-    setPrimaryColor(tpl.primaryColor);
-    setSecondaryColor(tpl.secondaryColor);
-    setBgColor(tpl.bgColor);
-    setAccentColor(tpl.accentColor);
-    setBgImage(tpl.backgroundImage);
-    setOverlayOpacity(tpl.overlayOpacity);
-    setBgPattern(tpl.bgPattern);
+    if (tpl.tagline) setTagline(tpl.tagline);
+    if (tpl.badge) setBadgeText(tpl.badge);
+    if (tpl.headlineFont) setHeadlineFont(tpl.headlineFont);
+    if (tpl.subFont) setSubFont(tpl.subFont);
+    if (tpl.align) setAlign(tpl.align);
+    if (tpl.primaryColor) setPrimaryColor(tpl.primaryColor);
+    if (tpl.secondaryColor) setSecondaryColor(tpl.secondaryColor);
+    if (tpl.bgColor) setBgColor(tpl.bgColor);
+    if (tpl.accentColor) setAccentColor(tpl.accentColor);
+    if (tpl.bgPattern) setBgPattern(tpl.bgPattern);
+    if (tpl.backgroundImage !== undefined) setBgImage(tpl.backgroundImage);
+    if (tpl.overlayOpacity !== undefined) setOverlayOpacity(tpl.overlayOpacity);
 
     const fmt = MEDIA_FORMATS.find(m => m.id === tpl.formatId) || MEDIA_FORMATS[0];
     setActiveFormat(fmt);
+  };
+
+  const handleSaveAsMyTemplate = () => {
+    const templateData = {
+      title: headline || 'My Custom Design',
+      subtitle: subtitle || '',
+      tagline: tagline || '',
+      badge: badgeText || 'MY CUSTOM TEMPLATE',
+      headlineFont,
+      subFont,
+      align,
+      primaryColor,
+      secondaryColor,
+      bgColor,
+      accentColor,
+      bgPattern,
+      backgroundImage: bgImage,
+      overlayOpacity,
+      formatId: activeFormat.id
+    };
+    saveMyTemplate(templateData);
   };
 
   const applyPalette = (pal) => {
@@ -154,6 +176,7 @@ export default function CanvasStudio({ currentDesign, onExport }) {
       
       {/* TOP TOOLBAR */}
       <EditorToolbar
+        onBack={onBack}
         activeFormat={activeFormat}
         setActiveFormat={setActiveFormat}
         showBleed={showBleed}
@@ -165,6 +188,7 @@ export default function CanvasStudio({ currentDesign, onExport }) {
         zoomLevel={zoomLevel}
         setZoomLevel={setZoomLevel}
         onExport={onExport}
+        onSaveAsMyTemplate={handleSaveAsMyTemplate}
       />
 
       <div className="grid-mobile-stack" style={{ display: 'grid', gridTemplateColumns: '360px 1fr 340px', gap: '24px' }}>

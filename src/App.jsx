@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard/Dashboard';
+import TemplateLibrary from './components/TemplateLibrary';
 import HeroSection from './components/HeroSection';
 import PortfolioGallery from './components/PortfolioGallery';
 import CanvasStudio from './components/StudioEditor/CanvasStudio';
@@ -65,10 +66,22 @@ export default function App() {
         {activeTab === 'dashboard' && (
           <Dashboard
             onOpenStudioWithFormat={handleOpenStudioWithFormat}
+            onOpenTemplates={() => setActiveTab('templates')}
             onEditProject={handleSelectDesignForStudio}
             onExportProject={(item) => {
               setCurrentDesign(item);
               handleTriggerExport('png');
+            }}
+          />
+        )}
+
+        {/* Tab Templates: Online Template Library */}
+        {activeTab === 'templates' && (
+          <TemplateLibrary
+            onBack={() => setActiveTab('dashboard')}
+            onSelectTemplate={(template) => {
+              setCurrentDesign(template);
+              setActiveTab('studio');
             }}
           />
         )}
@@ -85,6 +98,7 @@ export default function App() {
         {/* Tab 1: Portfolio Showcase & Filterable Gallery */}
         {activeTab === 'gallery' && (
           <PortfolioGallery
+            onBack={() => setActiveTab('dashboard')}
             onSelectDesignForEditor={handleSelectDesignForStudio}
             onSelectForMockup={handleSelectDesignForMockup}
           />
@@ -93,6 +107,7 @@ export default function App() {
         {/* Tab 2: Interactive Graphic Studio Canvas Editor */}
         {activeTab === 'studio' && (
           <CanvasStudio
+            onBack={() => setActiveTab('templates')}
             currentDesign={currentDesign}
             setCurrentDesign={setCurrentDesign}
             onExport={handleTriggerExport}
@@ -101,17 +116,24 @@ export default function App() {
 
         {/* Tab 3: 3D Perspective Mockup Stage */}
         {activeTab === 'mockups' && (
-          <MockupStage activeDesign={currentDesign} />
+          <MockupStage
+            onBack={() => setActiveTab('gallery')}
+            activeDesign={currentDesign}
+          />
         )}
 
         {/* Tab 4: Brand Kit & Color Palette Generator */}
         {activeTab === 'brandkit' && (
-          <BrandKitGenerator />
+          <BrandKitGenerator
+            onBack={() => setActiveTab('dashboard')}
+          />
         )}
 
         {/* Tab 5: Print Technical Specifications & DPI Inspector */}
         {activeTab === 'printspecs' && (
-          <PrintSpecInspector />
+          <PrintSpecInspector
+            onBack={() => setActiveTab('dashboard')}
+          />
         )}
 
         {/* Tab 6: Monetization & Subscription Pricing ($ USD) */}
